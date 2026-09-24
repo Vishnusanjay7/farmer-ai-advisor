@@ -1,0 +1,203 @@
+[
+  {
+    "scenario": "A",
+    "original_question": "What fertilizer schedule should be followed for Wheat in Punjab?",
+    "normalized_question": "What fertilizer schedule should be followed for Wheat in Punjab?",
+    "language": "en-IN",
+    "detected_intent": "CROP_ADVISORY",
+    "extracted_context": {
+      "crop": "Wheat",
+      "state": "Punjab"
+    },
+    "retrieval_source": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+    "retrieved_evidence": "### Monitoring and Cultural Control:\n- Install sex pheromone traps with 5 mg lures @ 4-5 traps per acre at 20 days after transplanting (DAT).\n- Collect and destroy egg masses deposited near leaf tips....",
+    "relevance_score": 0.25,
+    "llm_called": "NO",
+    "exact_final_response_text": "I couldn't find enough verified agricultural information in official ICAR, SAU, or government sources to answer that safely. (Retrieved knowledge relevance is below the safety threshold (0.55).)",
+    "citations": [
+      {
+        "title": "Integrated Pest & Disease Management for Rice (Paddy) in India",
+        "issuing_authority": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+        "official_url": "https://icar-iirr.org/advisory/pop_rice_ipm_2024.pdf",
+        "relevance_score": 0.25,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.25,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.25,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Integrated Management of Pink Bollworm and Sucking Pests in Cotton",
+        "issuing_authority": "ICAR - Central Institute for Cotton Research (CICR), Nagpur",
+        "official_url": "https://cicr.org.in/advisories/cotton_ipm_guidelines_2024.pdf",
+        "relevance_score": 0.25,
+        "data_origin": "production_cached"
+      }
+    ],
+    "data_origin": "production_cached",
+    "abstained": "YES",
+    "abstention_reason": "Retrieved knowledge relevance is below the safety threshold (0.55)."
+  },
+  {
+    "scenario": "B",
+    "original_question": "How to control yellow stem borer in paddy?",
+    "normalized_question": "How to control yellow stem borer in paddy?",
+    "language": "en-IN",
+    "detected_intent": "PEST_DISEASE",
+    "extracted_context": {
+      "crop": "Paddy",
+      "pest_disease": "Yellow stem borer"
+    },
+    "retrieval_source": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+    "retrieved_evidence": "## Yellow Stem Borer (Scirpophaga incertulas) Management\nThe Yellow Stem Borer causes dead hearts at the vegetative stage and white ears at the heading stage....",
+    "relevance_score": 0.8,
+    "llm_called": "YES",
+    "exact_final_response_text": "Yellow Stem Borer (Scirpophaga incertulas) Management:\n- The Yellow Stem Borer causes dead hearts at the vegetative stage and white ears at the heading stage.\n\nMonitoring and Cultural Control::\n- Install sex pheromone traps with 5 mg lures @ 4-5 traps per acre at 20 days after transplanting (DAT).\n- Collect and destroy egg masses deposited near leaf tips.\n- Avoid excessive and delayed nitrogenous fertilizer applications which increase stem borer susceptibility.",
+    "citations": [
+      {
+        "title": "Integrated Pest & Disease Management for Rice (Paddy) in India",
+        "issuing_authority": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+        "official_url": "https://icar-iirr.org/advisory/pop_rice_ipm_2024.pdf",
+        "relevance_score": 0.8,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Integrated Pest & Disease Management for Rice (Paddy) in India",
+        "issuing_authority": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+        "official_url": "https://icar-iirr.org/advisory/pop_rice_ipm_2024.pdf",
+        "relevance_score": 0.8,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Integrated Pest & Disease Management for Rice (Paddy) in India",
+        "issuing_authority": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+        "official_url": "https://icar-iirr.org/advisory/pop_rice_ipm_2024.pdf",
+        "relevance_score": 0.35,
+        "data_origin": "production_cached"
+      },
+      {
+        "title": "Integrated Pest & Disease Management for Rice (Paddy) in India",
+        "issuing_authority": "ICAR - Indian Institute of Rice Research (IIRR), Hyderabad",
+        "official_url": "https://icar-iirr.org/advisory/pop_rice_ipm_2024.pdf",
+        "relevance_score": 0.35,
+        "data_origin": "production_cached"
+      }
+    ],
+    "data_origin": "production_cached",
+    "abstained": "NO",
+    "abstention_reason": "N/A"
+  },
+  {
+    "scenario": "C",
+    "original_question": "Who is eligible for PM-KISAN scheme and what documents are required?",
+    "normalized_question": "Who is eligible for PM-KISAN scheme and what documents are required?",
+    "language": "en-IN",
+    "detected_intent": "GOVERNMENT_SCHEME",
+    "extracted_context": {},
+    "retrieval_source": "Ministry of Agriculture & Farmers Welfare, Department of Agriculture & Farmers Welfare",
+    "retrieved_evidence": "Scheme Name: Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) (PM_KISAN)\nSponsoring Agency: Ministry of Agriculture & Farmers Welfare, Department of Agriculture & Farmers Welfare\nBenefits: Financial benef...",
+    "relevance_score": 0.99,
+    "llm_called": "NO",
+    "exact_final_response_text": "Official Government Scheme: Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)\n- Sponsoring Agency: Ministry of Agriculture & Farmers Welfare, Department of Agriculture & Farmers Welfare\n\nScheme Name: Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) (PM_KISAN)\nSponsoring Agency: Ministry of Agriculture & Farmers Welfare, Department of Agriculture & Farmers Welfare\nBenefits: Financial benefit of ₹6,000 per year per family, payable in three equal four-monthly installments of ₹2,000 each directly transferred to the bank accounts of beneficiaries via Aadhaar-linked DBT.\nEligibility Criteria: All landholding farmer families having cultivable landholding in their names.; Exclusions apply: Institutional landholders, farmer families holding constitutional posts, serving/retired government officers/employees, income tax payees in last assessment year, and professionals (doctors, engineers, lawyers, CAs).\nRequired Documents: Aadhaar Card (Mandatory); Land ownership records (Khata/Khatoni/ROR/Patta document); Active Aadhaar-linked Bank Account (Passbook copy); e-KYC authentication via mobile OTP or biometric CSC verification\nApplication Process: Farmers can register online at the official PM-KISAN portal (pmkisan.gov.in) via 'Farmer Corner -> New Farmer Registration' or visit their nearest Common Service Centre (CSC) or local revenue / agriculture nodal officer.\nOfficial Portal: https://pmkisan.gov.in\n\nNote on Eligibility: Documented eligibility criteria are listed above. Individual farmer eligibility cannot be determined without verifying your specific land records and documentation at the official portal (https://pmkisan.gov.in).",
+    "citations": [
+      {
+        "title": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+        "issuing_authority": "Ministry of Agriculture & Farmers Welfare, Department of Agriculture & Farmers Welfare",
+        "official_url": "https://pmkisan.gov.in",
+        "relevance_score": 0.99,
+        "data_origin": "production_live"
+      },
+      {
+        "title": "Kisan Credit Card (KCC) Scheme",
+        "issuing_authority": "Reserve Bank of India & Ministry of Agriculture & Farmers Welfare",
+        "official_url": "https://myscheme.gov.in/schemes/kcc",
+        "relevance_score": 0.4,
+        "data_origin": "production_live"
+      },
+      {
+        "title": "Soil Health Card Scheme",
+        "issuing_authority": "Department of Agriculture & Farmers Welfare",
+        "official_url": "https://soilhealth.dac.gov.in",
+        "relevance_score": 0.4,
+        "data_origin": "production_live"
+      }
+    ],
+    "data_origin": "production_live",
+    "abstained": "NO",
+    "abstention_reason": "N/A"
+  },
+  {
+    "scenario": "D",
+    "original_question": "What is the wheat price in Indore mandi?",
+    "normalized_question": "What is the wheat price in Indore mandi?",
+    "language": "en-IN",
+    "detected_intent": "MANDI_PRICE",
+    "extracted_context": {
+      "crop": "Wheat",
+      "state": "Madhya Pradesh",
+      "district": "Indore",
+      "market": "Indore"
+    },
+    "retrieval_source": "Agmarknet",
+    "retrieved_evidence": "Market: Indore, District: Indore, State: Madhya Pradesh. Commodity: Wheat (Variety: Lokwan, Grade: FAQ). Modal Price: Rs. 2650.00/quintal (Min: Rs. 2450.00, Max: Rs. 2850.00). Arrival Date: 2026-09-22...",
+    "relevance_score": 0.95,
+    "llm_called": "NO",
+    "exact_final_response_text": "Verified Market Price: Wheat in Indore Mandi (Indore, Madhya Pradesh).\n- Commodity: Wheat\n- Market: Indore (Indore, Madhya Pradesh)\n- Variety / Grade: Lokwan / FAQ\n- Minimum Price: ₹2450.00/quintal\n- Maximum Price: ₹2850.00/quintal\n- Modal Price: ₹2650.00/quintal\n- Arrival Date: 2026-09-22\n- Source: Agmarknet\n- Data Origin: production_live (Official source • Live data)",
+    "citations": [
+      {
+        "title": "Mandi Price: Wheat in Indore",
+        "issuing_authority": "Agmarknet",
+        "official_url": "https://agmarknet.gov.in",
+        "relevance_score": 0.95,
+        "data_origin": "production_live"
+      }
+    ],
+    "data_origin": "production_live",
+    "abstained": "NO",
+    "abstention_reason": "N/A"
+  },
+  {
+    "scenario": "E",
+    "original_question": "What is the drone spraying schedule for dragon fruit in Ladakh?",
+    "normalized_question": "What is the drone spraying schedule for dragon fruit in Ladakh?",
+    "language": "en-IN",
+    "detected_intent": "UNSUPPORTED",
+    "extracted_context": {},
+    "retrieval_source": "None",
+    "retrieved_evidence": "None",
+    "relevance_score": 0.0,
+    "llm_called": "NO",
+    "exact_final_response_text": "I couldn't find enough verified agricultural information in official ICAR, SAU, or government sources to answer that safely. (Query is outside the supported agricultural advisory scope.)",
+    "citations": [],
+    "data_origin": "None",
+    "abstained": "YES",
+    "abstention_reason": "Query is outside the supported agricultural advisory scope."
+  },
+  {
+    "scenario": "F",
+    "original_question": "Who won the cricket match yesterday?",
+    "normalized_question": "Who won the cricket match yesterday?",
+    "language": "en-IN",
+    "detected_intent": "UNSUPPORTED",
+    "extracted_context": {},
+    "retrieval_source": "None",
+    "retrieved_evidence": "None",
+    "relevance_score": 0.0,
+    "llm_called": "NO",
+    "exact_final_response_text": "I couldn't find enough verified agricultural information in official ICAR, SAU, or government sources to answer that safely. (Query is outside the supported agricultural advisory scope.)",
+    "citations": [],
+    "data_origin": "None",
+    "abstained": "YES",
+    "abstention_reason": "Query is outside the supported agricultural advisory scope."
+  }
+]

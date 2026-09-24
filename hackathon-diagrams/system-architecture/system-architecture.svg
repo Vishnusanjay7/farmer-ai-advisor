@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 820" width="1400" height="820" font-family="Segoe UI,Inter,Arial,sans-serif">
+<defs>
+  <marker id="mg" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#16a34a"/></marker>
+  <marker id="mb" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#2563eb"/></marker>
+  <marker id="mp" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7c3aed"/></marker>
+  <marker id="ma" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#d97706"/></marker>
+  <marker id="mc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0284c7"/></marker>
+  <marker id="mr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#dc2626"/></marker>
+  <marker id="ms" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#64748b"/></marker>
+  <filter id="sh" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.06"/></filter>
+</defs>
+<rect width="1400" height="820" fill="#FFFFFF"/>
+<g opacity="0.35" stroke="#F1F5F9" stroke-width="1">
+  <line x1="0" y1="80" x2="1400" y2="80"/>
+  <line x1="0" y1="160" x2="1400" y2="160"/>
+  <line x1="0" y1="240" x2="1400" y2="240"/>
+  <line x1="0" y1="320" x2="1400" y2="320"/>
+  <line x1="0" y1="400" x2="1400" y2="400"/>
+  <line x1="0" y1="480" x2="1400" y2="480"/>
+  <line x1="0" y1="560" x2="1400" y2="560"/>
+  <line x1="0" y1="640" x2="1400" y2="640"/>
+  <line x1="0" y1="720" x2="1400" y2="720"/>
+  <line x1="100" y1="0" x2="100" y2="820"/>
+  <line x1="200" y1="0" x2="200" y2="820"/>
+  <line x1="300" y1="0" x2="300" y2="820"/>
+  <line x1="400" y1="0" x2="400" y2="820"/>
+  <line x1="500" y1="0" x2="500" y2="820"/>
+  <line x1="600" y1="0" x2="600" y2="820"/>
+  <line x1="700" y1="0" x2="700" y2="820"/>
+  <line x1="800" y1="0" x2="800" y2="820"/>
+  <line x1="900" y1="0" x2="900" y2="820"/>
+  <line x1="1000" y1="0" x2="1000" y2="820"/>
+  <line x1="1100" y1="0" x2="1100" y2="820"/>
+  <line x1="1200" y1="0" x2="1200" y2="820"/>
+  <line x1="1300" y1="0" x2="1300" y2="820"/>
+</g>
+<rect x="0" y="0" width="1400" height="56" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+<text x="28" y="35" font-size="20" font-weight="700" fill="#1D4ED8">HackWave &#183; KrishiVaani</text>
+<text x="290" y="35" font-size="14" font-weight="600" fill="#475569">System Architecture (Editable PPT View)</text>
+<rect x="580" y="14" width="790" height="28" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+<text x="975" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#B45309">&#9733; Official agricultural data is the source of truth &#8212; AI retrieves, validates, and communicates it</text>
+<text x="28" y="80" font-size="10" font-weight="700" fill="#15803D" letter-spacing="1.5">FARMER INTERFACE</text>
+<text x="240" y="80" font-size="10" font-weight="700" fill="#1D4ED8" letter-spacing="1.5">FASTAPI BACKEND PIPELINE (ORCHESTRATION &amp; RAG)</text>
+<text x="1108" y="80" font-size="10" font-weight="700" fill="#0284C7" letter-spacing="1.5">AUTHORITATIVE DATA SOURCES</text>
+<rect x="22" y="90" width="154" height="54" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" filter="url(#sh)"/>
+<text x="99" y="114" text-anchor="middle" font-size="18">&#128106;</text>
+<text x="99" y="133" text-anchor="middle" font-size="13" font-weight="700" fill="#15803D">Farmer</text>
+<line x1="99" y1="144" x2="99" y2="164" stroke="#16A34A" stroke-width="1.8" marker-end="url(#mg)"/>
+<rect x="22" y="166" width="154" height="46" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" filter="url(#sh)"/>
+<text x="99" y="186" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">Voice / Text Input</text>
+<text x="99" y="202" text-anchor="middle" font-size="9" fill="#334155">Multimodal entry point</text>
+<line x1="99" y1="212" x2="99" y2="232" stroke="#16A34A" stroke-width="1.8"/>
+<polygon points="99 232, 150 250, 99 268, 48 250" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.8"/>
+<text x="99" y="254" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0369A1">Voice?</text>
+<line x1="48" y1="250" x2="16" y2="250" stroke="#0284C7" stroke-width="1.5"/>
+<line x1="16" y1="250" x2="16" y2="302" stroke="#0284C7" stroke-width="1.5"/>
+<line x1="16" y1="302" x2="22" y2="302" stroke="#0284C7" stroke-width="1.5" marker-end="url(#mc)"/>
+<text x="14" y="242" font-size="8.5" font-weight="700" fill="#0284C7">Yes</text>
+<rect x="22" y="280" width="154" height="50" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="2" filter="url(#sh)"/>
+<text x="99" y="300" text-anchor="middle" font-size="11" font-weight="700" fill="#0369A1">Sarvam STT</text>
+<text x="99" y="314" text-anchor="middle" font-size="8.5" fill="#0284C7">saaras:v3 &#183; Indic Audio</text>
+<text x="99" y="325" text-anchor="middle" font-size="8" fill="#64748B">BCP-47 language tag</text>
+<line x1="176" y1="305" x2="222" y2="305" stroke="#0284C7" stroke-width="1.8" marker-end="url(#mc)"/>
+<line x1="150" y1="250" x2="222" y2="250" stroke="#16A34A" stroke-width="1.8" marker-end="url(#mg)"/>
+<text x="175" y="242" font-size="8.5" font-weight="700" fill="#15803D">No (Text)</text>
+<rect x="22" y="650" width="154" height="50" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="2" filter="url(#sh)"/>
+<text x="99" y="670" text-anchor="middle" font-size="11" font-weight="700" fill="#0369A1">Sarvam TTS</text>
+<text x="99" y="684" text-anchor="middle" font-size="8.5" fill="#0284C7">bulbul:v3 &#183; Indic Voice</text>
+<text x="99" y="695" text-anchor="middle" font-size="8" fill="#64748B">Speech synthesis (voice)</text>
+<line x1="99" y1="700" x2="99" y2="720" stroke="#16A34A" stroke-width="1.8" marker-end="url(#mg)"/>
+<rect x="22" y="722" width="154" height="34" rx="6" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" filter="url(#sh)"/>
+<text x="99" y="738" text-anchor="middle" font-size="10" font-weight="700" fill="#15803D">Response to Farmer</text>
+<text x="99" y="750" text-anchor="middle" font-size="8" fill="#334155">Multilingual Voice or Text</text>
+<path d="M 22 739 H 8 V 117 H 20" fill="none" stroke="#16A34A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#mg)"/>
+<rect x="216" y="90" width="850" height="668" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="232" y="114" font-size="12" font-weight="700" fill="#1D4ED8">FastAPI Backend Orchestrator</text>
+<text x="232" y="129" font-size="9" fill="#64748B">Modular RAG Architecture &#183; Request ID Tracking &#183; Async Pipelines</text>
+<rect x="232" y="148" width="154" height="46" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="1.8" filter="url(#sh)"/>
+<text x="309" y="168" text-anchor="middle" font-size="11" font-weight="700" fill="#1D4ED8">FastAPI /query</text>
+<text x="309" y="183" text-anchor="middle" font-size="8.5" fill="#334155">Request validation &amp; ID</text>
+<line x1="309" y1="194" x2="309" y2="214" stroke="#2563EB" stroke-width="1.8" marker-end="url(#mb)"/>
+<rect x="232" y="216" width="154" height="42" rx="8" fill="#FFFFFF" stroke="#4F46E5" stroke-width="1.8" filter="url(#sh)"/>
+<text x="309" y="235" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4338CA">Query Preprocessing</text>
+<text x="309" y="249" text-anchor="middle" font-size="8.5" fill="#334155">Unicode NFKC &#183; Clean &#183; Lang</text>
+<line x1="309" y1="258" x2="309" y2="278" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#mb)"/>
+<rect x="232" y="280" width="154" height="42" rx="8" fill="#FFFFFF" stroke="#4F46E5" stroke-width="1.8" filter="url(#sh)"/>
+<text x="309" y="299" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4338CA">Intent Classification</text>
+<text x="309" y="313" text-anchor="middle" font-size="8.5" fill="#334155">Regex keywords &#183; 6 intents</text>
+<line x1="309" y1="322" x2="309" y2="342" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#mb)"/>
+<rect x="232" y="344" width="154" height="42" rx="8" fill="#FFFFFF" stroke="#4F46E5" stroke-width="1.8" filter="url(#sh)"/>
+<text x="309" y="363" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4338CA">Context Extraction</text>
+<text x="309" y="377" text-anchor="middle" font-size="8.5" fill="#334155">Crop &#183; State &#183; Season &#183; Stage</text>
+<line x1="232" y1="301" x2="198" y2="301" stroke="#DC2626" stroke-width="1.5" marker-end="url(#mr)"/>
+<rect x="132" y="286" width="64" height="30" rx="6" fill="#FFFFFF" stroke="#DC2626" stroke-width="1.6"/>
+<text x="164" y="300" text-anchor="middle" font-size="8" font-weight="700" fill="#B91C1C">Unsupported</text>
+<text x="164" y="310" text-anchor="middle" font-size="7" fill="#DC2626">Safe refusal</text>
+<line x1="309" y1="386" x2="309" y2="410" stroke="#4F46E5" stroke-width="1.8"/>
+<polygon points="309 410, 360 428, 309 446, 258 428" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.8"/>
+<text x="309" y="432" text-anchor="middle" font-size="9.5" font-weight="700" fill="#6D28D9">Routing</text>
+<line x1="360" y1="428" x2="400" y2="428" stroke="#7C3AED" stroke-width="1.8"/>
+<line x1="400" y1="428" x2="400" y2="456" stroke="#7C3AED" stroke-width="1.8" marker-end="url(#mp)"/>
+<rect x="390" y="458" width="206" height="84" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<text x="493" y="478" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6D28D9">Agricultural Knowledge Retrieval</text>
+<text x="493" y="493" text-anchor="middle" font-size="8.5" font-weight="600" fill="#7C3AED">Vector + Keyword Hybrid Search</text>
+<text x="493" y="508" text-anchor="middle" font-size="8" fill="#334155">&#183; Text-embedding-004 (768-dim)</text>
+<text x="493" y="520" text-anchor="middle" font-size="8" fill="#334155">&#183; Match chunks with similarity threshold</text>
+<text x="493" y="532" text-anchor="middle" font-size="8" fill="#334155">&#183; Filter by crop &amp; advisory domain</text>
+<line x1="309" y1="446" x2="309" y2="480" stroke="#059669" stroke-width="1.8"/>
+<line x1="309" y1="480" x2="620" y2="480" stroke="#059669" stroke-width="1.8"/>
+<line x1="620" y1="480" x2="620" y2="456" stroke="#059669" stroke-width="1.8" marker-end="url(#mg)"/>
+<rect x="616" y="458" width="168" height="84" rx="8" fill="#FFFFFF" stroke="#059669" stroke-width="2" filter="url(#sh)"/>
+<text x="700" y="478" text-anchor="middle" font-size="10.5" font-weight="700" fill="#047857">Government Schemes</text>
+<text x="700" y="493" text-anchor="middle" font-size="8.5" font-weight="600" fill="#059669">Structured Scheme Data</text>
+<text x="700" y="508" text-anchor="middle" font-size="8" fill="#334155">&#183; State &amp; central schemes</text>
+<text x="700" y="520" text-anchor="middle" font-size="8" fill="#334155">&#183; Eligibility &amp; benefit matching</text>
+<text x="700" y="532" text-anchor="middle" font-size="8" fill="#334155">&#183; Direct application link</text>
+<line x1="620" y1="480" x2="810" y2="480" stroke="#D97706" stroke-width="1.8"/>
+<line x1="810" y1="480" x2="810" y2="456" stroke="#D97706" stroke-width="1.8" marker-end="url(#ma)"/>
+<rect x="804" y="458" width="158" height="84" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2" filter="url(#sh)"/>
+<text x="883" y="478" text-anchor="middle" font-size="10.5" font-weight="700" fill="#B45309">Mandi Market Prices</text>
+<text x="883" y="493" text-anchor="middle" font-size="8.5" font-weight="600" fill="#D97706">Structured Mandi Data</text>
+<text x="883" y="508" text-anchor="middle" font-size="8" fill="#334155">&#183; Commodity &amp; APMC market</text>
+<text x="883" y="520" text-anchor="middle" font-size="8" fill="#334155">&#183; Min, Max, Modal prices (&#8377;)</text>
+<text x="883" y="532" text-anchor="middle" font-size="8" fill="#334155">&#183; Latest arrival date check</text>
+<line x1="493" y1="542" x2="493" y2="572" stroke="#7C3AED" stroke-width="1.8"/>
+<line x1="700" y1="542" x2="700" y2="572" stroke="#059669" stroke-width="1.8"/>
+<line x1="883" y1="542" x2="883" y2="572" stroke="#D97706" stroke-width="1.8"/>
+<line x1="493" y1="572" x2="883" y2="572" stroke="#2563EB" stroke-width="1.8"/>
+<line x1="681" y1="572" x2="681" y2="596" stroke="#2563EB" stroke-width="1.8" marker-end="url(#mb)"/>
+<rect x="560" y="598" width="242" height="52" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2" filter="url(#sh)"/>
+<text x="681" y="618" text-anchor="middle" font-size="11" font-weight="700" fill="#B45309">Retrieved Evidence</text>
+<text x="681" y="632" text-anchor="middle" font-size="8.5" fill="#334155">Authoritative chunks + structured data context</text>
+<text x="681" y="643" text-anchor="middle" font-size="8" fill="#64748B">Ground truth verified from official sources</text>
+<line x1="560" y1="624" x2="480" y2="624" stroke="#DC2626" stroke-width="1.8"/>
+<line x1="480" y1="624" x2="480" y2="648" stroke="#DC2626" stroke-width="1.8" marker-end="url(#mr)"/>
+<rect x="390" y="650" width="180" height="48" rx="8" fill="#FFFFFF" stroke="#DC2626" stroke-width="2" filter="url(#sh)"/>
+<text x="480" y="668" text-anchor="middle" font-size="10.5" font-weight="700" fill="#B91C1C">Insufficient Evidence</text>
+<text x="480" y="681" text-anchor="middle" font-size="8.5" font-weight="700" fill="#DC2626">&#8594; ABSTAIN</text>
+<text x="480" y="692" text-anchor="middle" font-size="7.5" fill="#64748B">Directs to Kisan Call Center (1800-180-1551)</text>
+<line x1="681" y1="650" x2="681" y2="674" stroke="#6366F1" stroke-width="2" marker-end="url(#mp)"/>
+<rect x="560" y="676" width="242" height="54" rx="8" fill="#FFFFFF" stroke="#6366F1" stroke-width="2.2" filter="url(#sh)"/>
+<text x="681" y="696" text-anchor="middle" font-size="11" font-weight="700" fill="#4338CA">&#10022; Gemini LLM (Reasoning Layer)</text>
+<text x="681" y="710" text-anchor="middle" font-size="8.5" font-weight="700" fill="#6366F1">Strictly constrained to retrieved evidence</text>
+<text x="681" y="722" text-anchor="middle" font-size="8" fill="#334155">Multilingual synthesis &#183; NEVER source of truth</text>
+<line x1="681" y1="730" x2="681" y2="748" stroke="#2563EB" stroke-width="1.8" marker-end="url(#mb)"/>
+<rect x="560" y="750" width="242" height="42" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<text x="681" y="768" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1D4ED8">Grounding Validation &amp; Citations</text>
+<text x="681" y="782" text-anchor="middle" font-size="8" fill="#334155">Post-LLM fact check &#183; Append source document metadata</text>
+<line x1="560" y1="771" x2="176" y2="771" stroke="#16A34A" stroke-width="1.8"/>
+<line x1="176" y1="771" x2="176" y2="675" stroke="#0284C7" stroke-width="1.8" marker-end="url(#mc)"/>
+<line x1="176" y1="740" x2="176" y2="740" stroke="#16A34A" stroke-width="1.8" marker-end="url(#mg)"/>
+<rect x="1080" y="90" width="300" height="668" rx="12" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1096" y="114" font-size="12" font-weight="700" fill="#0369A1">Authoritative Data Stores</text>
+<text x="1096" y="129" font-size="9" fill="#64748B">Official Government &amp; Institutional Truth</text>
+<rect x="1096" y="148" width="268" height="74" rx="8" fill="#FFFFFF" stroke="#059669" stroke-width="1.8" filter="url(#sh)"/>
+<text x="1110" y="168" font-size="10.5" font-weight="700" fill="#047857">ICAR / Agricultural Universities</text>
+<text x="1110" y="182" font-size="8.5" fill="#334155">&#183; POP (Package of Practices)</text>
+<text x="1110" y="195" font-size="8.5" fill="#334155">&#183; Crop advisory manuals &amp; pest guides</text>
+<text x="1110" y="208" font-size="8" fill="#059669">Verified scientific source</text>
+<rect x="1096" y="234" width="268" height="74" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.8" filter="url(#sh)"/>
+<text x="1110" y="254" font-size="10.5" font-weight="700" fill="#B45309">Government Scheme Database</text>
+<text x="1110" y="268" font-size="8.5" fill="#334155">&#183; MoAFW, PM-KISAN, PMFBY, KCC</text>
+<text x="1110" y="281" font-size="8.5" fill="#334155">&#183; Subsidies, eligibility criteria</text>
+<text x="1110" y="294" font-size="8" fill="#D97706">Official ministry portals</text>
+<rect x="1096" y="320" width="268" height="74" rx="8" fill="#FFFFFF" stroke="#0891B2" stroke-width="1.8" filter="url(#sh)"/>
+<text x="1110" y="340" font-size="10.5" font-weight="700" fill="#0E7490">Agmarknet / Data.gov.in</text>
+<text x="1110" y="354" font-size="8.5" fill="#334155">&#183; Daily APMC wholesale market records</text>
+<text x="1110" y="367" font-size="8.5" fill="#334155">&#183; Commodity rates &amp; arrival quantities</text>
+<text x="1110" y="380" font-size="8" fill="#0891B2">Government open data portal</text>
+<rect x="1096" y="410" width="268" height="236" rx="8" fill="#FFFFFF" stroke="#0D9488" stroke-width="2" filter="url(#sh)"/>
+<text x="1110" y="432" font-size="11" font-weight="700" fill="#0F766E">&#128451; Supabase PostgreSQL + pgvector</text>
+<text x="1110" y="447" font-size="8.5" fill="#0D9488">Production Relational &amp; Vector Database</text>
+<rect x="1110" y="459" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="473" font-size="8.5" font-weight="700" fill="#0F766E">knowledge_chunks</text>
+<text x="1342" y="473" text-anchor="end" font-size="7.5" fill="#64748B">vector(768) + full text</text>
+<rect x="1110" y="485" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="499" font-size="8.5" font-weight="700" fill="#0F766E">source_documents</text>
+<text x="1342" y="499" text-anchor="end" font-size="7.5" fill="#64748B">ICAR/Govt PDF provenance</text>
+<rect x="1110" y="511" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="525" font-size="8.5" font-weight="700" fill="#0F766E">government_schemes</text>
+<text x="1342" y="525" text-anchor="end" font-size="7.5" fill="#64748B">Scheme criteria & benefits</text>
+<rect x="1110" y="537" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="551" font-size="8.5" font-weight="700" fill="#0F766E">mandi_prices</text>
+<text x="1342" y="551" text-anchor="end" font-size="7.5" fill="#64748B">Daily APMC commodity rates</text>
+<rect x="1110" y="563" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="577" font-size="8.5" font-weight="700" fill="#0F766E">farmer_profiles / crops</text>
+<text x="1342" y="577" text-anchor="end" font-size="7.5" fill="#64748B">User context & farm info</text>
+<rect x="1110" y="589" width="240" height="20" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<text x="1118" y="603" font-size="8.5" font-weight="700" fill="#0F766E">conversations / query_logs</text>
+<text x="1342" y="603" text-anchor="end" font-size="7.5" fill="#64748B">Audit trail & responses</text>
+<line x1="1096" y1="500" x2="596" y2="500" stroke="#7C3AED" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#mp)"/>
+<line x1="1096" y1="520" x2="784" y2="520" stroke="#059669" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#mg)"/>
+<line x1="1096" y1="540" x2="962" y2="540" stroke="#D97706" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#ma)"/>
+<rect x="1096" y="658" width="268" height="86" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.8"/>
+<text x="1110" y="678" font-size="9.5" font-weight="700" fill="#B45309">&#9888; Grounding Boundary Rule</text>
+<text x="1110" y="694" font-size="8.5" fill="#334155">&#183; Official data is ground truth</text>
+<text x="1110" y="708" font-size="8.5" fill="#334155">&#183; Gemini is only the reasoning engine</text>
+<text x="1110" y="722" font-size="8.5" fill="#334155">&#183; No hallucinations permitted</text>
+<text x="1110" y="736" font-size="8.5" fill="#B91C1C">&#183; Insufficient evidence = Abstain</text>
+<rect x="0" y="792" width="1400" height="28" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+<text x="28" y="810" font-size="9" fill="#64748B">KrishiVaani Architecture &#183; HackWave Hackathon &#183; Simple Editable PPT Diagram</text>
+<text x="1372" y="810" text-anchor="end" font-size="9" fill="#1D4ED8" font-weight="600">FastAPI + Supabase (pgvector) + Gemini + Sarvam AI</text>
+</svg>

@@ -1,0 +1,122 @@
+{
+  "turn_1": {
+    "user_query": "गेहूं में सिंचाई कब करनी चाहिए?",
+    "input_channel": "voice",
+    "language": "hi-IN",
+    "stt_status": 200,
+    "detected_intent": "CROP_ADVISORY",
+    "extracted_context": {
+      "crop": "Wheat"
+    },
+    "inherited_context": {},
+    "response_text": "Critical Irrigation Stages:\n- Wheat requires 4 to 6 irrigations depending on soil texture:\n- 1. Crown Root Initiation (CRI) stage: 20-25 days after sowing (Most critical - never delay this irrigation).\n- 2. Tillering stage: 40-45 days after sowing.\n- 3. Jointing stage: 60-65 days after sowing.\n- 4. Flowering stage: 80-85 days after sowing.\n- 5. Milking stage: 100-105 days after sowing.",
+    "citations": [
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.6257,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.0538,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.0279,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      }
+    ],
+    "data_origin": "production_cached",
+    "abstained": false,
+    "tts_status": 200,
+    "tts_audio_format": "wav"
+  },
+  "turn_2": {
+    "user_query": "इसमें पीला रतुआ कैसे रोकें?",
+    "input_channel": "voice",
+    "language": "hi-IN",
+    "conversation_id": "9f113193-0573-46b8-8f81-4261c62da925",
+    "detected_intent": "PEST_DISEASE",
+    "extracted_context": {
+      "crop": "Wheat",
+      "pest_disease": "Rust"
+    },
+    "inherited_context": {
+      "crop": "Wheat"
+    },
+    "response_text": "Yellow Rust (Puccinia striiformis) Prevention:\n- Symptoms: Linear yellow stripes of powdery pustules on leaves during cold, humid weather.\n- Monitoring: Inspect fields regularly from January onwards, especially along water channels and shaded tree lines.\n- Chemical Management at initial detection: Spray Propiconazole 25% EC @ 200 ml in 200 liters of water per acre. Repeat after 15 days only if disease persists.",
+    "citations": [
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.5554,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.0,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      },
+      {
+        "title": "Wheat Production Technology, Nutrient Schedule & Rust Disease Prevention",
+        "issuing_authority": "ICAR - Indian Agricultural Research Institute (IARI / Pusa), New Delhi",
+        "official_url": "https://iari.res.in/technologies/wheat_production_guide_2024.pdf",
+        "relevance_score": 0.0,
+        "data_origin": "production_cached",
+        "arrival_date": null
+      }
+    ],
+    "data_origin": "production_cached",
+    "abstained": false
+  },
+  "turn_3": {
+    "user_query": "इंदौर मंडी में गेहूं का भाव",
+    "input_channel": "text",
+    "language": "hi-IN",
+    "detected_intent": "MANDI_PRICE",
+    "extracted_context": {
+      "crop": "Wheat",
+      "district": "Indore",
+      "pest_disease": "Rust"
+    },
+    "llm_called": false,
+    "response_text": "Verified Market Price: Wheat in Indore Mandi (Indore, Madhya Pradesh).\n- Commodity: Wheat\n- Market: Indore (Indore, Madhya Pradesh)\n- Variety / Grade: Lokwan / FAQ\n- Minimum Price: ₹2450.00/quintal\n- Maximum Price: ₹2850.00/quintal\n- Modal Price: ₹2650.00/quintal\n- Arrival Date: 2026-09-22\n- Source: Agmarknet\n- Data Origin: production_live (Official source • Live data)",
+    "citations": [
+      {
+        "title": "Mandi Price: Wheat in Indore",
+        "issuing_authority": "Agmarknet",
+        "official_url": "https://agmarknet.gov.in",
+        "relevance_score": 0.95,
+        "data_origin": "production_live",
+        "arrival_date": "2026-09-22"
+      }
+    ],
+    "data_origin": "production_live",
+    "abstained": false
+  },
+  "turn_4": {
+    "user_query": "कल का क्रिकेट मैच किसने जीता?",
+    "input_channel": "text",
+    "language": "hi-IN",
+    "detected_intent": "UNSUPPORTED",
+    "llm_called": false,
+    "response_text": "मुझे इस सवाल का सुरक्षित उत्तर देने के लिए आधिकारिक कृषि और सरकारी स्रोतों में पर्याप्त सत्यापित जानकारी नहीं मिली। (Query is outside the supported agricultural advisory scope.)",
+    "abstained": true,
+    "abstention_reason": "Query is outside the supported agricultural advisory scope."
+  }
+}
