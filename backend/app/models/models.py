@@ -189,7 +189,7 @@ class GovernmentScheme(Base):
 class MandiPrice(Base):
     __tablename__ = "mandi_prices"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     state = Column(String(50), nullable=False, index=True)
     district = Column(String(50), nullable=False, index=True)
     market = Column(String(100), nullable=False)

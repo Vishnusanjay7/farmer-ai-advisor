@@ -146,3 +146,71 @@ def test_conversation_and_query_log_uuid_mapping():
     db.close()
 
 
+def test_mandi_price_uuid_mapping():
+    """Regression test ensuring MandiPrice.id uses Uuid type compatible with PostgreSQL/Psycopg 3."""
+    import uuid
+    from datetime import date
+    from sqlalchemy import create_engine, Uuid
+    from sqlalchemy.orm import sessionmaker
+    from backend.app.db.session import Base
+
+    # 1. Type inspection
+    assert isinstance(MandiPrice.id.type, Uuid)
+    assert MandiPrice.id.type.as_uuid is False
+
+    # 2. Persistence and query verification
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+
+    test_id = str(uuid.uuid4())
+    price = MandiPrice(
+        id=test_id,
+        state="Madhya Pradesh",
+        district="Indore",
+        market="Indore",
+        commodity="Wheat",
+        variety="Lokwan",
+        grade="FAQ",
+        arrival_date=date(2026, 9, 25),
+        min_price=2400.0,
+        max_price=2600.0,
+        modal_price=2500.0,
+        source="Agmarknet / data.gov.in",
+        data_origin="production_live",
+    )
+    db.add(price)
+    db.commit()
+
+    # Query by string UUID
+    fetched = db.query(MandiPrice).filter(MandiPrice.id == test_id).first()
+    assert fetched is not None
+    assert fetched.id == test_id
+    assert fetched.commodity == "Wheat"
+    assert fetched.modal_price == 2500.0
+
+    # Also verify insertion with default UUID generator
+    price_default = MandiPrice(
+        state="Madhya Pradesh",
+        district="Ujjain",
+        market="Ujjain",
+        commodity="Soybean",
+        variety="Yellow",
+        grade="FAQ",
+        arrival_date=date(2026, 9, 25),
+        min_price=4100.0,
+        max_price=4400.0,
+        modal_price=4250.0,
+    )
+    db.add(price_default)
+    db.commit()
+
+    assert price_default.id is not None
+    assert isinstance(price_default.id, str)
+    assert len(price_default.id) == 36
+
+    db.close()
+
+
+
