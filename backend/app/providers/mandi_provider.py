@@ -217,3 +217,86 @@ class AgmarknetMandiProvider(MandiPriceProvider):
         # 3. No live or cached records available
         logger.info(f"No mandi records found for state='{state}', commodity='{commodity}'. Returning empty result.")
         return []
+
+
+# Maintain explicit DataGovMandiProvider naming alongside existing AgmarknetMandiProvider
+DataGovMandiProvider = AgmarknetMandiProvider
+
+
+class CompositeMandiProvider(MandiPriceProvider):
+    """
+    Composite Mandi Price Provider orchestrating:
+    1. Primary: DataGovMandiProvider (when DATA_GOV_IN_API_KEY is configured)
+    2. Fallback: AgmarknetPublicProvider (public Agmarknet 2.0 backend, no key required)
+    3. Cache fallback: PostgreSQL verified records (production_cached)
+    4. Safe abstention: returns []
+    """
+
+    def __init__(
+        self,
+        db: Optional[Session] = None,
+        primary_provider: Optional[MandiPriceProvider] = None,
+        fallback_provider: Optional[MandiPriceProvider] = None,
+    ):
+        self.db = db
+        from backend.app.providers.agmarknet_public_provider import AgmarknetPublicProvider
+
+        self.primary_provider = primary_provider or DataGovMandiProvider(db=db)
+        self.fallback_provider = fallback_provider or AgmarknetPublicProvider(db=db)
+
+    async def get_prices(
+        self, state: str, district: Optional[str] = None, commodity: Optional[str] = None
+    ) -> List[MandiPriceDTO]:
+        logger.info(
+            f"CompositeMandiProvider: Processing query state='{state}', district='{district}', commodity='{commodity}'"
+        )
+
+        # 1. Primary: Try Data.gov.in provider if API key is present
+        datagov_key = getattr(self.primary_provider, "api_key", None)
+        if datagov_key:
+            try:
+                records = await self.primary_provider.get_prices(
+                    state=state, district=district, commodity=commodity
+                )
+                if records and any(r.data_origin == "production_live" for r in records):
+                    logger.info("CompositeMandiProvider: Successfully served from primary Data.gov.in.")
+                    return records
+            except Exception as exc:
+                logger.warning(
+                    f"CompositeMandiProvider: Primary DataGov provider failed ({exc}). Trying fallback AgmarknetPublicProvider."
+                )
+
+        # 2. Fallback: Try public Agmarknet 2.0 provider
+        try:
+            records = await self.fallback_provider.get_prices(
+                state=state, district=district, commodity=commodity
+            )
+            if records:
+                logger.info(
+                    f"CompositeMandiProvider: Served {len(records)} records from fallback AgmarknetPublicProvider."
+                )
+                return records
+        except Exception as exc:
+            logger.warning(
+                f"CompositeMandiProvider: Fallback AgmarknetPublicProvider failed ({exc})."
+            )
+
+        # 3. Cache fallback: Check database for any verified cached records
+        if hasattr(self.primary_provider, "get_cached_records"):
+            cached = self.primary_provider.get_cached_records(
+                state=state, district=district, commodity=commodity
+            )
+            if cached:
+                logger.info(
+                    f"CompositeMandiProvider: Served {len(cached)} records from database cache (production_cached)."
+                )
+                return cached
+
+        # 4. Safe abstention
+        logger.info("CompositeMandiProvider: No records available from any provider or cache.")
+        return []
+
+
+def get_mandi_provider(db: Optional[Session] = None) -> MandiPriceProvider:
+    """Returns the configured composite mandi provider with automatic failover."""
+    return CompositeMandiProvider(db=db)

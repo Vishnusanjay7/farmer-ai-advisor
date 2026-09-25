@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     # Government Data APIs
     DATA_GOV_IN_API_KEY: Optional[str] = None
     AGMARKNET_RESOURCE_ID: str = "9ef84268-d588-465a-a308-a864a43d0070"
+    AGMARKNET_CACHE_TTL_SECONDS: int = 21600  # 6 hours default TTL
+
 
     # LLM & Embeddings Provider
     LLM_API_KEY: Optional[str] = None

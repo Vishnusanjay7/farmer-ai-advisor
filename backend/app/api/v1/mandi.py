@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.db.session import get_db
-from backend.app.providers.mandi_provider import AgmarknetMandiProvider
+from backend.app.providers.mandi_provider import AgmarknetMandiProvider, get_mandi_provider
 from backend.app.schemas.mandi import MandiPricesResponse
 
 router = APIRouter(prefix="/mandi", tags=["Mandi Prices"])
@@ -23,8 +23,9 @@ async def get_mandi_prices(
     Falls back to cached authoritative records on upstream failure.
     Records clearly specify arrival_date and data_origin ('production_live', 'production_cached', 'development_seed').
     """
-    provider = AgmarknetMandiProvider(db=db)
+    provider = get_mandi_provider(db=db)
     records = await provider.get_prices(state=state, district=district, commodity=commodity)
+
 
     total = len(records)
     start_idx = (page - 1) * page_size

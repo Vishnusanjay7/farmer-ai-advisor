@@ -35,8 +35,13 @@ class RetrievalService:
     - UNSUPPORTED / UNKNOWN: returns empty list.
     """
 
-    def __init__(self, embedding_provider: Optional[EmbeddingProvider] = None):
+    def __init__(
+        self,
+        embedding_provider: Optional[EmbeddingProvider] = None,
+        auto_fetch_mandi: bool = False,
+    ):
         self.embedding_provider = embedding_provider or get_embedding_provider()
+        self.auto_fetch_mandi = auto_fetch_mandi
 
     async def retrieve(
         self,
@@ -55,9 +60,10 @@ class RetrievalService:
         elif intent == AgriculturalIntent.GOVERNMENT_SCHEME:
             return self._retrieve_government_schemes(db, query, context, k)
         elif intent == AgriculturalIntent.MANDI_PRICE:
-            return self._retrieve_mandi_prices(db, query, context, k)
+            return await self._retrieve_mandi_prices(db, query, context, k)
         else:
             return []
+
 
     async def _retrieve_agricultural_knowledge(
         self,
@@ -269,7 +275,7 @@ class RetrievalService:
 
         return evidence_items
 
-    def _retrieve_mandi_prices(
+    async def _retrieve_mandi_prices(
         self,
         db: Session,
         query: str,
@@ -281,7 +287,9 @@ class RetrievalService:
         CRITICAL GUARDRAIL:
         - Only accepts data_origin IN ('production_live', 'production_cached').
         - Strictly REJECTS data_origin = 'development_seed'.
-        - If no matching verified record exists, returns empty list so the system abstains.
+        - If no matching verified record exists in DB and auto_fetch_mandi is True,
+          attempts on-demand live retrieval via get_mandi_provider.
+        - If still no matching verified record exists, returns empty list so the system abstains.
         """
         q = db.query(MandiPrice).filter(
             MandiPrice.data_origin.in_(["production_live", "production_cached"])
@@ -299,6 +307,21 @@ class RetrievalService:
                 q = q.filter(MandiPrice.market.ilike(f"%{context.market}%"))
 
         records = q.order_by(MandiPrice.arrival_date.desc()).limit(top_k).all()
+
+        # On-demand provider fetch if no verified records exist in cache and auto_fetch_mandi is enabled
+        if not records and self.auto_fetch_mandi and context and (context.commodity or context.crop):
+            comm = context.commodity or context.crop
+            state = context.state or ""
+            district = context.district or context.market
+            try:
+                from backend.app.providers.mandi_provider import get_mandi_provider
+                provider = get_mandi_provider(db=db)
+                fetched = await provider.get_prices(state=state, district=district, commodity=comm)
+                if fetched:
+                    # Re-query DB for the newly cached records
+                    records = q.order_by(MandiPrice.arrival_date.desc()).limit(top_k).all()
+            except Exception as e:
+                logger.warning(f"On-demand mandi provider retrieval failed: {e}")
 
         evidence_items = []
         for r in records:
@@ -340,4 +363,4 @@ class RetrievalService:
         return evidence_items
 
 
-retrieval_service = RetrievalService()
+retrieval_service = RetrievalService(auto_fetch_mandi=True)
