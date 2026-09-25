@@ -86,3 +86,63 @@ def test_source_document_provenance_and_chunk_index():
     )
     assert chunk.chunk_index == 3
 
+
+def test_conversation_and_query_log_uuid_mapping():
+    """Regression test ensuring Conversation.id and QueryLog.conversation_id use Uuid type compatible with PostgreSQL/Psycopg 3."""
+    import uuid
+    from sqlalchemy import create_engine, Uuid
+    from sqlalchemy.orm import sessionmaker
+    from backend.app.db.session import Base
+
+    # 1. Type inspection
+    assert isinstance(Conversation.id.type, Uuid)
+    assert Conversation.id.type.as_uuid is False
+    assert isinstance(QueryLog.conversation_id.type, Uuid)
+    assert QueryLog.conversation_id.type.as_uuid is False
+
+    # 2. Functional persistence and query check
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+
+    conv_uuid = str(uuid.uuid4())
+    farmer = FarmerProfile(
+        id=str(uuid.uuid4()),
+        session_id=f"test-sess-{conv_uuid[:8]}",
+        state="Punjab",
+        district="Ludhiana",
+    )
+    db.add(farmer)
+    db.flush()
+
+    conv = Conversation(id=conv_uuid, farmer_id=farmer.id, title="Test Conversation")
+    db.add(conv)
+    db.flush()
+
+    query1 = QueryLog(
+        id=str(uuid.uuid4()),
+        conversation_id=conv_uuid,
+        farmer_id=farmer.id,
+        detected_language="en-IN",
+        raw_transcript="What about yellow rust?",
+        classified_intent="PEST_DISEASE",
+        extracted_entities={"crop": "Wheat"},
+    )
+    db.add(query1)
+    db.commit()
+
+    # Query by string UUID representation
+    fetched_conv = db.query(Conversation).filter(Conversation.id == conv_uuid).first()
+    assert fetched_conv is not None
+    assert fetched_conv.id == conv_uuid
+
+    fetched_queries = db.query(QueryLog).filter(QueryLog.conversation_id == conv_uuid).all()
+    assert len(fetched_queries) == 1
+    assert fetched_queries[0].conversation_id == conv_uuid
+    assert fetched_queries[0].raw_transcript == "What about yellow rust?"
+    assert fetched_queries[0].extracted_entities["crop"] == "Wheat"
+
+    db.close()
+
+
