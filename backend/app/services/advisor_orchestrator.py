@@ -24,6 +24,10 @@ from backend.app.services.context_extractor import context_extractor
 from backend.app.services.retrieval_service import retrieval_service, RetrievalService
 from backend.app.services.grounding_validator import grounding_validator, GroundingValidator
 from backend.app.providers.llm_provider import LLMProvider, get_llm_provider
+from backend.app.schemas.weather import WeatherData
+from backend.app.services.location_resolver import location_resolver
+from backend.app.providers.weather_provider import open_meteo_provider
+from backend.app.services.weather_rules import summarize_weather_facts
 
 
 class AdvisorOrchestrator:
@@ -157,6 +161,81 @@ class AdvisorOrchestrator:
             similarity_threshold=settings.RAG_SIMILARITY_THRESHOLD,
         )
 
+        # Weather Context Resolution & Evidence Packaging
+        is_weather_intent = intent in (
+            AgriculturalIntent.WEATHER_CURRENT,
+            AgriculturalIntent.WEATHER_FORECAST,
+            AgriculturalIntent.WEATHER_RAIN,
+            AgriculturalIntent.WEATHER_TEMPERATURE,
+            AgriculturalIntent.WEATHER_ADVISORY,
+        )
+
+        has_weather_context = is_weather_intent or any(
+            re.search(p, preprocessed.normalized_query.lower())
+            for p in (
+                intent_classifier.WEATHER_RAIN_KEYWORDS
+                + intent_classifier.WEATHER_TEMPERATURE_KEYWORDS
+                + intent_classifier.WEATHER_FORECAST_KEYWORDS
+                + intent_classifier.WEATHER_CURRENT_KEYWORDS
+                + intent_classifier.WEATHER_ADVISORY_KEYWORDS
+            )
+        )
+
+        weather_data: Optional[WeatherData] = None
+        if has_weather_context:
+            loc_req_lat = request.farmer_context.latitude if request.farmer_context else None
+            loc_req_lon = request.farmer_context.longitude if request.farmer_context else None
+            loc = location_resolver.resolve(
+                latitude=loc_req_lat,
+                longitude=loc_req_lon,
+                district=extracted_ctx.district or effective_inherited.get("district"),
+                state=extracted_ctx.state or effective_inherited.get("state"),
+                allow_default=True,
+            )
+            if loc:
+                weather_data = await open_meteo_provider.fetch_weather(location=loc)
+
+        if weather_data:
+            weather_obs = summarize_weather_facts(weather_data)
+            weather_content = (
+                f"Location: {weather_data.location.resolved_name} (Estimation Method: {weather_data.location.resolution_method.value})\n"
+                f"Current Conditions: Temperature {weather_data.current.temperature} C, Relative Humidity {weather_data.current.relative_humidity}%, "
+                f"Wind Speed {weather_data.current.wind_speed} km/h, Condition: {weather_data.current.weather_description}\n"
+                f"3-Day Forecast: " + "; ".join(
+                    f"{d.date}: Min {d.temp_min} C, Max {d.temp_max} C, Rain Probability {d.precipitation_probability_max}%, Precipitation {d.precipitation_sum} mm, Max Wind {d.wind_speed_max} km/h"
+                    for d in weather_data.forecast_days
+                ) + "\n"
+                f"Soil & Evaporative Metrics: ET0 {weather_obs.et0_today} mm/day, "
+                f"Soil Temp {weather_data.soil.soil_temperature_0_to_10cm if weather_data.soil else 'N/A'} C, "
+                f"Soil Moisture {weather_data.soil.soil_moisture_0_to_1cm if weather_data.soil else 'N/A'} m3/m3\n"
+                f"Meteorological Signals: " + (", ".join(weather_obs.signals_summary) if weather_obs.signals_summary else "Normal conditions")
+            )
+            weather_evidence = EvidenceItemDTO(
+                evidence_id=f"weather-{weather_data.location.latitude:.2f}-{weather_data.location.longitude:.2f}",
+                source_name="Open-Meteo",
+                title=f"Open-Meteo Weather Model ({weather_data.location.resolved_name})",
+                issuing_authority="Open-Meteo Weather Model",
+                official_url="https://open-meteo.com/",
+                content=weather_content,
+                relevance_score=0.95,
+                data_origin=weather_data.data_origin,
+                status="authoritative",
+                metadata={
+                    "latitude": weather_data.location.latitude,
+                    "longitude": weather_data.location.longitude,
+                    "location_resolution_method": weather_data.location.resolution_method.value,
+                    "forecast_timestamp": weather_data.fetched_at,
+                    "timezone": weather_data.timezone,
+                    "fetched_at": weather_data.fetched_at,
+                    "current_temp": weather_data.current.temperature,
+                    "current_humidity": weather_data.current.relative_humidity,
+                    "rain_expected": weather_data.signals.rain_expected,
+                    "high_wind_signal": weather_data.signals.high_wind_signal,
+                    "source_type": "weather_model",
+                },
+            )
+            evidence.append(weather_evidence)
+
         # Layer 5: Pre-LLM Evidence Validation & Abstention Gate
         is_sufficient, abstention_reason = self.validator.validate_pre_llm(
             intent=intent,
@@ -176,14 +255,18 @@ class AdvisorOrchestrator:
                     relevance_score=e.relevance_score,
                     data_origin=e.data_origin,
                     arrival_date=e.metadata.get("arrival_date"),
+                    source_type=e.metadata.get("source_type", "agricultural_document"),
+                    location_resolution_method=e.metadata.get("location_resolution_method"),
                 )
             )
 
         # Handle Immediate Abstention (No LLM call)
         if not is_sufficient:
+            is_weather_abstention = is_weather_intent and not any(e.source_name == "Open-Meteo" for e in evidence)
             abstention_msg = self.validator.get_abstention_text(
                 language=request.language,
                 reason_detail=abstention_reason,
+                is_weather=is_weather_abstention,
             )
             cat = "UNSUPPORTED" if intent in (AgriculturalIntent.UNSUPPORTED, AgriculturalIntent.UNKNOWN) else "INSUFFICIENT_EVIDENCE"
             response = AdvisorQueryResponse(
@@ -209,7 +292,7 @@ class AdvisorOrchestrator:
             self._persist_log(db, response, preprocessed, conv_id, start_time, current_user=current_user)
             return response
 
-        # Layer 6 & 7: Response Generation (Deterministic for Mandi/Schemes, LLM for Knowledge)
+        # Layer 6 & 7: Response Generation (Deterministic for Mandi/Schemes/Weather, LLM for Knowledge)
         has_tomorrow = bool(re.search(r"\b(tomorrow|future|next day|kal|நாளை|రేపు|उद्या|നാളെ|ਕੱਲ੍ਹ|ଆସନ୍ତାକାଲି)\b", preprocessed.normalized_query.lower()))
 
         if intent == AgriculturalIntent.MANDI_PRICE:
@@ -221,6 +304,10 @@ class AdvisorOrchestrator:
             # Deterministic formatting of structured scheme records in regional language
             top_scheme = evidence[0]
             raw_answer = self._format_scheme_response(top_scheme, request.language)
+            llm_called = False
+        elif is_weather_intent and weather_data and not extracted_ctx.crop:
+            # Deterministic formatting of pure weather query in regional language
+            raw_answer = self._format_weather_response(weather_data, request.language, intent)
             llm_called = False
         else:
             # Grounded Prompt Construction & LLM Provider Execution for Agricultural Knowledge
@@ -281,7 +368,17 @@ class AdvisorOrchestrator:
 
         # Layer 9: Safety Disclaimer Application (QA Requirement 8)
         # Apply standard disclaimer only if answer is informational and not already abstained
-        if not abstained and intent not in (AgriculturalIntent.MANDI_PRICE, AgriculturalIntent.GOVERNMENT_SCHEME, AgriculturalIntent.CROP_INSURANCE, AgriculturalIntent.AGRICULTURAL_CREDIT):
+        if not abstained and intent not in (
+            AgriculturalIntent.MANDI_PRICE,
+            AgriculturalIntent.GOVERNMENT_SCHEME,
+            AgriculturalIntent.CROP_INSURANCE,
+            AgriculturalIntent.AGRICULTURAL_CREDIT,
+            AgriculturalIntent.WEATHER_CURRENT,
+            AgriculturalIntent.WEATHER_FORECAST,
+            AgriculturalIntent.WEATHER_RAIN,
+            AgriculturalIntent.WEATHER_TEMPERATURE,
+            AgriculturalIntent.WEATHER_ADVISORY,
+        ):
             disclaimer = {
                 "hi-IN": "\n\n(सलाह: किसी भी रासायनिक छिड़काव से पहले स्थानीय कृषि विज्ञान केंद्र (KVK) या कृषि अधिकारी से पुष्टि अवश्य करें।)",
                 "te-IN": "\n\n(సలహా: ఏదైనా రసాయన పిచికారీ చేయడానికి ముందు స్థానిక కృషి విజ్ఞాన కేంద్రం (KVK) లేదా వ్యవసాయ అధికారిని సంప్రదించండి.)",
@@ -584,6 +681,121 @@ class AdvisorOrchestrator:
             f"- Sponsoring Agency: {top_scheme.issuing_authority}\n\n"
             f"{top_scheme.content}\n\n"
             f"Note on Eligibility: Documented eligibility criteria are listed above. Individual farmer eligibility cannot be determined without verifying your specific land records and documentation at the official portal ({top_scheme.official_url})."
+        )
+
+    def _format_weather_response(
+        self,
+        w: WeatherData,
+        language: str,
+        intent: AgriculturalIntent,
+    ) -> str:
+        """Formats structured Open-Meteo weather facts and neutral signals into regional language text."""
+        lang_key = language if language != "or-IN" else "od-IN"
+        loc_name = w.location.resolved_name
+        is_gps = w.location.resolution_method.value == "gps_coordinates"
+        c_temp = w.current.temperature
+        c_hum = w.current.relative_humidity
+        c_wind = w.current.wind_speed
+        c_desc = w.current.weather_description
+        c_rain = w.current.precipitation
+
+        forecast_lines = []
+        for d in w.forecast_days:
+            forecast_lines.append(
+                f"• {d.date}: Min {d.temp_min:.1f}°C, Max {d.temp_max:.1f}°C | Rain Prob: {d.precipitation_probability_max}% | Rain: {d.precipitation_sum:.1f} mm | Wind Max: {d.wind_speed_max:.1f} km/h ({d.weather_description})"
+            )
+        f_text = "\n".join(forecast_lines)
+
+        et0_str = f"{w.forecast_days[0].et0_evapotranspiration:.2f} mm/day" if w.forecast_days and w.forecast_days[0].et0_evapotranspiration is not None else "N/A"
+        soil_t_str = f"{w.soil.soil_temperature_0_to_10cm:.1f}°C" if w.soil and w.soil.soil_temperature_0_to_10cm is not None else "N/A"
+        soil_m_str = f"{w.soil.soil_moisture_0_to_1cm:.3f} m³/m³" if w.soil and w.soil.soil_moisture_0_to_1cm is not None else "N/A"
+
+        if lang_key == "hi-IN":
+            method_lbl = "जीपीएस निर्देशांक (सटीक स्थान)" if is_gps else "जिला केंद्र अनुमान (खुले क्षेत्र का अनुमान)"
+            rain_sig = "पूर्वानुमान अवधि में वर्षा या हल्की बौछारें पड़ने की संभावना है।" if w.signals.rain_expected else "पूर्वानुमान अवधि में मौसम मुख्यतः शुष्क रहने की संभावना है।"
+            wind_sig = f"चेतावनी: तेज हवा चलने का संकेत (अधिकतम {max((d.wind_speed_max for d in w.forecast_days), default=c_wind):.1f} किमी/घंटा)।" if w.signals.high_wind_signal else ""
+            signals_text = f"- {rain_sig}" + (f"\n- {wind_sig}" if wind_sig else "")
+
+            return (
+                f"मौसम रिपोर्ट एवं पूर्वानुमान (ओपन-मेटियो मॉडल)\n"
+                f"- स्थान: {loc_name} ({method_lbl})\n"
+                f"- वर्तमान स्थिति: {c_desc}\n"
+                f"- तापमान: {c_temp:.1f}°C | सापेक्ष आर्द्रता: {c_hum}% | हवा की गति: {c_wind:.1f} किमी/घंटा | वर्तमान वर्षा: {c_rain:.1f} मिमी\n\n"
+                f"3-दिवसीय पूर्वानुमान:\n{f_text}\n\n"
+                f"मृदा एवं वाष्पोत्सर्जन तथ्य:\n"
+                f"- ET0 (वाष्पोत्सर्जन दर): {et0_str}\n"
+                f"- मृदा तापमान (0-10 सेमी): {soil_t_str} | मृदा नमी (0-1 सेमी): {soil_m_str}\n\n"
+                f"मौसम संकेत:\n{signals_text}\n\n"
+                f"(नोट: यह मौसम डेटा ओपन-मेटियो संख्यात्मक मौसम मॉडल पर आधारित है। यह किसी खेत विशेष के लिए स्वतः कोई रासायनिक या कृषि निर्देश नहीं है।)"
+            )
+
+        elif lang_key == "te-IN":
+            method_lbl = "GPS కోఆర్డినేట్లు (క్షేత్ర స్థాయి)" if is_gps else "జిల్లా కేంద్ర అంచనా"
+            rain_sig = "సూచన వ్యవధిలో వర్షం లేదా జల్లులు పడే అవకాశం ఉంది." if w.signals.rain_expected else "సూచన వ్యవధిలో వాతావరణం పొడిగా ఉండే అవకాశం ఉంది."
+            signals_text = f"- {rain_sig}"
+
+            return (
+                f"వాతావరణ పరిశీలన & సూచన (ఓపెన్-మెటియో మోడల్)\n"
+                f"- ప్రాంతం: {loc_name} ({method_lbl})\n"
+                f"- ప్రస్తుత పరిస్థితి: {c_desc}\n"
+                f"- ఉష్ణోగ్రత: {c_temp:.1f}°C | తేమ: {c_hum}% | గాలి వేగం: {c_wind:.1f} కి.మీ/గం\n\n"
+                f"3 రోజుల సూచన:\n{f_text}\n\n"
+                f"నేల మరియు బాష్పీభవన కొలమానాలు:\n"
+                f"- ET0: {et0_str} | నేల ఉష్ణోగ్రత: {soil_t_str} | నేల తేమ: {soil_m_str}\n\n"
+                f"వాతావరణ సంకేతాలు:\n{signals_text}\n\n"
+                f"(గమనిక: ఈ వాతావరణ సమాచారం ఓపెన్-మెటియో సంఖ్యా నమూనా ద్వారా సమకూర్చబడింది. ఇది క్షేత్ర స్థాయి వ్యవసాయ ఆదేశం కాదు.)"
+            )
+
+        elif lang_key == "ta-IN":
+            method_lbl = "ஜிபிஎஸ் ஒருங்கிணைப்புகள் (துல்லிய இடம்)" if is_gps else "மாவட்ட மைய மதிப்பீடு"
+            rain_sig = "முன்னறிவிப்பு காலத்தில் மழைக்கு வாய்ப்புள்ளது." if w.signals.rain_expected else "முன்னறிவிப்பு காலத்தில் வானிலை பெரும்பாலும் வறண்டதாக இருக்கும்."
+            signals_text = f"- {rain_sig}"
+
+            return (
+                f"வானிலை அறிக்கை மற்றும் முன்னறிவிப்பு (ஓபன்-மெட்டியோ மாதிரி)\n"
+                f"- இடம்: {loc_name} ({method_lbl})\n"
+                f"- தற்போதைய நிலை: {c_desc}\n"
+                f"- வெப்பநிலை: {c_temp:.1f}°C | ஈரப்பதம்: {c_hum}% | காற்றின் வேகம்: {c_wind:.1f} கி.மீ/மணி\n\n"
+                f"3 நாள் முன்னறிவிப்பு:\n{f_text}\n\n"
+                f"மண் மற்றும் நீராவிப்போக்கு விவரங்கள்:\n"
+                f"- ET0: {et0_str} | மண் வெப்பநிலை: {soil_t_str} | மண் ஈரப்பதம்: {soil_m_str}\n\n"
+                f"வானிலை சமிக்ஞைகள்:\n{signals_text}\n\n"
+                f"(குறிப்பு: இந்த வானிலை தரவு ஓபன்-மெட்டியோ மாதிரியால் கணக்கிடப்பட்டது. இது ஒரு குறிப்பிட்ட பண்ணைக்கான கட்டாய பரிந்துரை அல்ல.)"
+            )
+
+        elif lang_key == "mr-IN":
+            method_lbl = "जीपीएस निर्देशांक" if is_gps else "जिल्हा केंद्र अंदाज"
+            rain_sig = "अंदाज कालावधीत पाऊस पडण्याची शक्यता आहे." if w.signals.rain_expected else "अंदाज कालावधीत हवामान कोरडे राहण्याची शक्यता आहे."
+
+            return (
+                f"हवामान अहवाल आणि अंदाज (ओपन-मेटिओ मॉडेल)\n"
+                f"- स्थान: {loc_name} ({method_lbl})\n"
+                f"- सद्यस्थिती: {c_desc}\n"
+                f"- तापमान: {c_temp:.1f}°C | आर्द्रता: {c_hum}% | वाऱ्याचा वेग: {c_wind:.1f} किमी/तास\n\n"
+                f"३ दिवसांचा अंदाज:\n{f_text}\n\n"
+                f"मृदा व बाष्पीभवन घटक:\n"
+                f"- ET0: {et0_str} | मातीचे तापमान: {soil_t_str} | मातीतील ओलावा: {soil_m_str}\n\n"
+                f"हवामान संकेत:\n- {rain_sig}\n\n"
+                f"(टीप: हा हवामान डेटा ओपन-मेटिओ संख्यात्मक मॉडेलद्वारे जिल्हा केंद्र अंदाजावर आधारित आहे. ही कृषी शिफारस नाही.)"
+            )
+
+        # Default en-IN and fallback for other regional languages
+        method_lbl = "GPS Coordinates (Field-Level)" if is_gps else "District Centroid Estimate (Regional Model)"
+        rain_sig = "Rain or showers expected during the forecast window." if w.signals.rain_expected else "Dry conditions expected during the forecast window."
+        wind_sig = f"Notice: Elevated wind speeds up to {max((d.wind_speed_max for d in w.forecast_days), default=c_wind):.1f} km/h." if w.signals.high_wind_signal else ""
+        signals_text = f"- {rain_sig}" + (f"\n- {wind_sig}" if wind_sig else "")
+
+        return (
+            f"Weather Observation & Forecast (Open-Meteo Model)\n"
+            f"- Location: {loc_name} ({method_lbl})\n"
+            f"- Current Weather: {c_desc}\n"
+            f"- Temperature: {c_temp:.1f}°C | Relative Humidity: {c_hum}% | Wind Speed: {c_wind:.1f} km/h | Precipitation: {c_rain:.1f} mm\n\n"
+            f"3-Day Forecast:\n{f_text}\n\n"
+            f"Soil & Evaporative Metrics:\n"
+            f"- Reference Evapotranspiration (ET0): {et0_str}\n"
+            f"- Soil Temperature (0-10 cm): {soil_t_str} | Soil Moisture (0-1 cm): {soil_m_str}\n\n"
+            f"Meteorological Signals:\n{signals_text}\n\n"
+            f"(Note: Weather observations and forecasts are generated by the Open-Meteo numerical model based on district-area centroids unless GPS coordinates were provided. This data does NOT constitute a field-specific agronomic prescription.)"
         )
 
     def _persist_log(

@@ -27,10 +27,29 @@ class GroundingValidator:
         "en-IN": "I couldn't find enough verified agricultural information in official ICAR, SAU, or government sources to answer that safely.",
     }
 
-    def get_abstention_text(self, language: str = "en-IN", reason_detail: Optional[str] = None) -> str:
+    WEATHER_ABSTENTION_MESSAGES = {
+        "hi-IN": "ओपन-मेटियो मौसम सेवा वर्तमान में अनुपलब्ध है। कृपया कुछ समय बाद पुनः प्रयास करें।",
+        "te-IN": "ఓపెన్-మెటియో వాతావరణ సేవ ప్రస్తుతం అందుబాటులో లేదు. దయచేసి కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.",
+        "ta-IN": "ஓபன்-மெட்டியோ வானிலை சேவை தற்போது கிடைக்கவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+        "mr-IN": "ओपन-मेटिओ हवामान सेवा सध्या उपलब्ध नाही. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा.",
+        "kn-IN": "ಓಪನ್-ಮೆಟಿಯೊ ಹವಾಮಾನ ಸೇವೆ ಪ್ರಸ್ತುತ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+        "bn-IN": "ওপেন-মেটিও আবহাওয়া পরিষেবা বর্তমানে অনুপলব্ধ। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।",
+        "gu-IN": "ઓપન-મેટિઓ હવામાન સેવા હાલમાં અનુપલબ્ધ છે. કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો.",
+        "ml-IN": "ഓപ്പൺ-മെറ്റിയോ കാലാവസ്ഥാ സേവനം ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
+        "pa-IN": "ਓਪਨ-ਮੇਟੀਓ ਮੌਸਮ ਸੇਵਾ ਫਿਲਹਾਲ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਕੁਝ ਸਮੇਂ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+        "od-IN": "ଓପନ୍-ମେଟିଓ ପାଣିପାଗ ସେବା ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ। ଦୟାକରି କିଛି ସମୟ ପରେ ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।",
+        "en-IN": "The Open-Meteo weather service is temporarily unavailable. Please try again shortly.",
+    }
+
+    def get_abstention_text(self, language: str = "en-IN", reason_detail: Optional[str] = None, is_weather: bool = False) -> str:
         lang_key = language
         if lang_key == "or-IN":
             lang_key = "od-IN"
+        if is_weather:
+            base = self.WEATHER_ABSTENTION_MESSAGES.get(lang_key, self.WEATHER_ABSTENTION_MESSAGES["en-IN"])
+            if reason_detail and language == "en-IN":
+                return f"{base} ({reason_detail})"
+            return base
         base = self.DEFAULT_ABSTENTION_MESSAGES.get(lang_key, self.DEFAULT_ABSTENTION_MESSAGES["en-IN"])
         if reason_detail and language == "en-IN":
             return f"{base} ({reason_detail})"
@@ -73,7 +92,23 @@ class GroundingValidator:
                 return False, "No matching central or state government agricultural schemes were found."
             return True, None
 
-        # 5. Check agricultural knowledge chunks (Crop Advisory, Pest/Disease, General Agri)
+        # 5. Check for dedicated weather intents
+        if intent in (
+            AgriculturalIntent.WEATHER_CURRENT,
+            AgriculturalIntent.WEATHER_FORECAST,
+            AgriculturalIntent.WEATHER_RAIN,
+            AgriculturalIntent.WEATHER_TEMPERATURE,
+            AgriculturalIntent.WEATHER_ADVISORY,
+        ):
+            valid_weather = [
+                e for e in evidence
+                if e.source_name == "Open-Meteo" and e.data_origin in ("production_live", "production_cached")
+            ]
+            if not valid_weather:
+                return False, "Open-Meteo weather service data is currently unavailable."
+            return True, None
+
+        # 6. Check agricultural knowledge chunks (Crop Advisory, Pest/Disease, General Agri)
         authoritative_items = [
             e for e in evidence
             if e.relevance_score >= similarity_threshold and e.status == "authoritative"

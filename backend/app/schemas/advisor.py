@@ -21,6 +21,11 @@ class AgriculturalIntent(str, Enum):
     STORAGE = "STORAGE"
     HARVESTING = "HARVESTING"
     GENERAL_AGRICULTURE = "GENERAL_AGRICULTURE"
+    WEATHER_CURRENT = "WEATHER_CURRENT"
+    WEATHER_FORECAST = "WEATHER_FORECAST"
+    WEATHER_RAIN = "WEATHER_RAIN"
+    WEATHER_TEMPERATURE = "WEATHER_TEMPERATURE"
+    WEATHER_ADVISORY = "WEATHER_ADVISORY"
     UNSUPPORTED = "UNSUPPORTED"
     UNKNOWN = "UNKNOWN"
 
@@ -43,6 +48,8 @@ class FarmerContextDTO(BaseModel):
     growth_stage: Optional[str] = None
     pest_disease: Optional[str] = None
     language: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class EvidenceItemDTO(BaseModel):
@@ -69,6 +76,8 @@ class CitationDTO(BaseModel):
     relevance_score: float = 0.0
     data_origin: Optional[str] = None
     arrival_date: Optional[str] = None
+    source_type: Optional[str] = None
+    location_resolution_method: Optional[str] = None
 
 
 class AdvisorQueryRequest(BaseModel):

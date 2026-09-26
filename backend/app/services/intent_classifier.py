@@ -136,10 +136,11 @@ class IntentClassifier:
         r"\brust\b", r"\bwilting\b", r"\binsect\b", r"\bfungus\b", r"\bcaterpillar\b",
         r"\bworm\b", r"\binfestation\b", r"\bsymptom\b", r"\byellow stem borer\b",
         r"\bbollworm\b", r"\baphid\b", r"\bmite\b", r"\bdamage\b", r"\bcontrol\b",
-        r"\bkill\b", r"\btreatment\b",
-        "कीट", "रोग", "इल्ली", "तनाव", "झुलसा", "फंगस", "रोकथाम", "उपचार", "कीड़ा", "तना छेदक", "नियंत्रण", "रतुआ", "माहू", "सूंड़ी",
-        "తెగులు", "పురుగు", "నివారణ",
-        "பூச்சி", "நோய்", "கட்டுப்பாடு",
+        r"\bkill\b", r"\btreatment\b", r"\bpesticide\b", r"\binsecticide\b", r"\bfungicide\b",
+        r"\bspray\b", r"\bspraying\b",
+        "कीट", "रोग", "इल्ली", "तनाव", "झुलसा", "फंगस", "रोकथाम", "उपचार", "कीड़ा", "तना छेदक", "नियंत्रण", "रतुआ", "माहू", "सूंड़ी", "कीटनाशक", "छिड़काव", "स्प्रे",
+        "తెగులు", "పురుగు", "నివారణ", "పురుగుమందు", "స్ప్రే",
+        "பூச்சி", "நோய்", "கட்டுப்பாடு", "பூச்சிக்கொல்லி", "தெளிப்பு",
         "रोग आणि कीड", "ರೋಗ", "কীটপতঙ্গ", "જીવાત", "കീടങ്ങൾ", "ਕੀੜੇ", "ରୋଗ"
     ]
 
@@ -153,10 +154,77 @@ class IntentClassifier:
         "लागवड", "ಬಿತ್ತನೆ", "বপন", "વાવણી", "വിത്ത്", "ਬਿਜਾਈ", "ବୁଣା"
     ]
 
+    WEATHER_RAIN_KEYWORDS = [
+        r"\brain\b", r"\braining\b", r"\brainfall\b", r"\bdownpour\b", r"\bshowers?\b", r"\bprecipitation\b",
+        "बारिश", "बरसात", "वर्षा", "पानी गिरना", "ओलावृष्टि",
+        "వర్షం", "వాన", "వర్షపాతం",
+        "மழை", "மழைப்பொழிவு",
+        "पाऊस", "पर्जन्य",
+        "ಮಳೆ", "ಮಳೆಗಾಲ",
+        "বৃষ্টি", "বৃষ্টিপাত",
+        "વરસાદ",
+        "മഴ",
+        "ਮੀਂਹ", "ਬਰਸਾਤ",
+        "ବର୍ଷା"
+    ]
+
+    WEATHER_TEMPERATURE_KEYWORDS = [
+        r"\btemperature\b", r"\bheat\b", r"\bcold\b", r"\bhot\b", r"\bfrost\b", r"\bdegrees?\b",
+        "तापमान", "गर्मी", "ठंड", "पाला", "सर्द",
+        "ఉష్ణోగ్రత", "ఎండ", "చలి",
+        "வெப்பநிலை", "தட்பவெப்பநிலை", "வெப்பம்", "குளிர்",
+        "तापमान", "उष्णता", "थंडी",
+        "ಉಷ್ಣಾಂಶ", "ತಾಪಮಾನ", "ಚಳಿ",
+        "তাপমাত্রা", "গরম", "ঠাণ্ডা",
+        "તાપમાન", "ગરમી", "ઠંડી",
+        "താപനില", "ചൂട്", "തണുപ്പ്",
+        "ਤਾਪਮਾਨ", "ਗਰਮੀ", "ਠੰਡ",
+        "ତାପମାତ୍ରା"
+    ]
+
+    WEATHER_FORECAST_KEYWORDS = [
+        r"\bforecast\b", r"\btomorrow\b.*\bweather\b", r"\bweather\b.*\btomorrow\b", r"\bnext days?\b.*\bweather\b",
+        r"\bweather outlook\b",
+        "मौसम पूर्वानुमान", "पूर्वानुमान", "कल का मौसम", "हवामान अंदाज",
+        "వాతావరణ సూచన", "రేపటి వాతావరణం",
+        "வானிலை முன்னறிவிப்பு", "நாளை வானிலை",
+        "ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ",
+        "আবহাওয়ার পূর্বাভাস",
+        "હવામાન આગાહી",
+        "കാലാവസ്ഥ പ്രവചനം",
+        "ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ",
+        "ପାଣିପାଗ ପୂର୍ବାନୁମାନ"
+    ]
+
+    WEATHER_CURRENT_KEYWORDS = [
+        r"\bcurrent weather\b", r"\bweather right now\b", r"\btoday\b.*\bweather\b", r"\bweather today\b",
+        "आज का मौसम", "अभी का मौसम", "वर्तमान मौसम", "मौसम कैसा है",
+        "ఈ రోజు వాతావరణం", "ప్రస్తుత వాతావరణం",
+        "இன்றைய வானிலை", "தற்போதைய வானிலை",
+        "आजचे हवामान",
+        "ಇಂದಿನ ಹವಾಮಾನ",
+        "આજનું હવામાન"
+    ]
+
+    WEATHER_ADVISORY_KEYWORDS = [
+        r"\bweather\b", r"\bclimate\b", r"\bhumidity\b", r"\bwind speed\b", r"\bwind\b",
+        r"\bet0\b", r"\bevapotranspiration\b", r"\bsoil moisture\b",
+        "मौसम", "आर्द्रता", "हवा की गति", "नमी",
+        "వాతావరణం", "తేమ", "గాలి వేగం",
+        "வானிலை", "ஈரப்பதம்", "காற்றின் வேகம்",
+        "हवामान", "आर्द्रता",
+        "ಹವಾಮಾನ", "ಆರ್ದ್ರತೆ",
+        "আবহাওয়া",
+        "હવામાન", "ભેજ",
+        "കാലാവസ്ഥ",
+        "ਮੌਸਮ",
+        "ପାଣିପାଗ"
+    ]
+
     GENERAL_AGRI_KEYWORDS = [
         r"\bcrop\b", r"\bfarm\b", r"\bfarming\b", r"\bagriculture\b", r"\bsoil\b",
-        r"\bweather\b", r"\bmonsoon\b", r"\bseason\b", r"\bkharif\b", r"\brabi\b",
-        "खेती", "कृषि", "फसल", "मिट्टी", "मौसम", "खरीफ", "रबी",
+        r"\bmonsoon\b", r"\bseason\b", r"\bkharif\b", r"\brabi\b",
+        "खेती", "कृषि", "फसल", "मिट्टी", "खरीफ", "रबी",
         "వ్యవసాయం", "పంట", "నేల",
         "விவசாயம்", "பயிர்", "மண்",
         "शेती", "ಕೃಷಿ", "কৃষি", "ખેતી", "കൃഷി", "ਖੇਤੀ", "କୃଷି"
@@ -248,7 +316,28 @@ class IntentClassifier:
             if re.search(pattern, q_lower):
                 return AgriculturalIntent.FERTILIZER, 0.92
 
-        # 6. Broader Crop Advisory check
+        # 6. Dedicated Weather Intents
+        for pattern in self.WEATHER_RAIN_KEYWORDS:
+            if re.search(pattern, q_lower):
+                return AgriculturalIntent.WEATHER_RAIN, 0.95
+
+        for pattern in self.WEATHER_TEMPERATURE_KEYWORDS:
+            if re.search(pattern, q_lower):
+                return AgriculturalIntent.WEATHER_TEMPERATURE, 0.95
+
+        for pattern in self.WEATHER_FORECAST_KEYWORDS:
+            if re.search(pattern, q_lower):
+                return AgriculturalIntent.WEATHER_FORECAST, 0.95
+
+        for pattern in self.WEATHER_CURRENT_KEYWORDS:
+            if re.search(pattern, q_lower):
+                return AgriculturalIntent.WEATHER_CURRENT, 0.95
+
+        for pattern in self.WEATHER_ADVISORY_KEYWORDS:
+            if re.search(pattern, q_lower):
+                return AgriculturalIntent.WEATHER_ADVISORY, 0.92
+
+        # 7. Broader Crop Advisory check
         crop_adv_matches = sum(1 for p in self.CROP_ADVISORY_KEYWORDS if re.search(p, q_lower))
         if crop_adv_matches > 0:
             return AgriculturalIntent.CROP_ADVISORY, min(0.70 + (crop_adv_matches * 0.1), 0.98)
