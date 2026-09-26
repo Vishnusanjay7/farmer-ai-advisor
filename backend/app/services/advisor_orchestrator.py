@@ -176,7 +176,7 @@ class AdvisorOrchestrator:
             # Deterministic formatting of structured mandi records (QA Requirement 4 & 6)
             top_mandi = evidence[0]
             m = top_mandi.metadata
-            origin_badge = "Official source • Live data" if top_mandi.data_origin == "production_live" else "Official source • Cached data"
+            origin_badge = "Official source • Latest available daily data" if top_mandi.data_origin == "production_live" else "Official source • Cached data"
             variety = m.get("variety")
             grade = m.get("grade")
             vg_str = f"{variety} / {grade}" if variety and grade else (variety or grade or "Standard / FAQ")

@@ -245,8 +245,10 @@ export default function FarmerAdvisorPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const msg = errorData.detail?.message || errorData.detail || "Speech recognition failed.";
-        throw new Error(msg);
+        // Log the raw backend diagnostic for developers; never surface to farmer.
+        const technicalDetail = errorData.detail?.message || errorData.detail || "STT provider error";
+        console.error("STT backend error detail:", technicalDetail);
+        throw new Error("VOICE_ERROR");
       }
 
       const result = await response.json();
@@ -259,7 +261,8 @@ export default function FarmerAdvisorPage() {
     } catch (err: any) {
       console.error("STT Error:", err);
       setAppState("ERROR");
-      setErrorMessage(err.message || "Failed to recognize speech. You can type your question below.");
+      // Always show a farmer-friendly message; never expose technical/backend error details.
+      setErrorMessage("Sorry, I couldn't process that voice recording. Please try again, or type your question below.");
     }
   };
 
@@ -585,7 +588,7 @@ export default function FarmerAdvisorPage() {
                     {msg.abstained ? (
                       <span className="badge-abstain">⚠️ Safe Abstention</span>
                     ) : msg.dataOrigin === "production_live" ? (
-                      <span className="badge-live">🟢 Official source • Live data</span>
+                      <span className="badge-live">🟢 Official source • Latest available daily data</span>
                     ) : (
                       <span className="badge-cached">🔵 Official source • Cached data</span>
                     )}
