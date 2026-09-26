@@ -1,3 +1,4 @@
+import re
 import uuid
 import time
 from typing import Optional, Dict, Any, List
@@ -59,6 +60,7 @@ class AdvisorOrchestrator:
 
         # Check for previous conversation context if conversation_id provided
         inherited_dict = {}
+        prev_intent = None
         if request.conversation_id:
             prev_queries = (
                 db.query(QueryLog)
@@ -66,6 +68,8 @@ class AdvisorOrchestrator:
                 .order_by(QueryLog.created_at.desc())
                 .all()
             )
+            if prev_queries:
+                prev_intent = prev_queries[0].classified_intent
             for pq in prev_queries:
                 if pq.extracted_entities and isinstance(pq.extracted_entities, dict):
                     for k in ["crop", "variety", "state", "district", "market", "season", "growth_stage", "pest_disease"]:
@@ -81,7 +85,24 @@ class AdvisorOrchestrator:
         )
 
         # Layer 2: Intent Classification
-        intent, intent_confidence = intent_classifier.classify(preprocessed.normalized_query)
+        raw_intent, intent_confidence = intent_classifier.classify(preprocessed.normalized_query)
+
+        # Contextual intent resolution:
+        # If current query was classified as UNSUPPORTED (e.g. follow-up phrase "What about tomorrow?"),
+        # check if it is an explicit out-of-scope query (e.g. cricket, politics).
+        # If NOT explicitly out-of-scope, and a valid agricultural intent was established in previous turns,
+        # inherit the prior conversation intent.
+        intent = raw_intent
+        is_explicit_out_of_scope = any(
+            re.search(p, preprocessed.normalized_query.lower())
+            for p in intent_classifier.OUT_OF_SCOPE_KEYWORDS
+        )
+        if intent == AgriculturalIntent.UNSUPPORTED and not is_explicit_out_of_scope:
+            if prev_intent and prev_intent not in (AgriculturalIntent.UNSUPPORTED.value, AgriculturalIntent.UNKNOWN.value):
+                try:
+                    intent = AgriculturalIntent(prev_intent)
+                except ValueError:
+                    pass
 
         # Layer 3: Agricultural Context Extraction
         extracted_ctx = context_extractor.extract(
@@ -192,6 +213,8 @@ class AdvisorOrchestrator:
                 f"- Source: {m.get('source', top_mandi.issuing_authority)}\n"
                 f"- Data Origin: {top_mandi.data_origin} ({origin_badge})"
             )
+            if re.search(r"\b(tomorrow|future|next day|kal)\b", preprocessed.normalized_query.lower()):
+                raw_answer += "\n- Note: Tomorrow's official prices are not published in advance. Displaying the latest verified daily arrival data."
             llm_called = False
         elif intent == AgriculturalIntent.GOVERNMENT_SCHEME:
             # Deterministic formatting of structured scheme records (QA Requirement 5 & 8)
@@ -387,8 +410,9 @@ class AdvisorOrchestrator:
             db.add(r_log)
             db.commit()
         except Exception as e:
-            logger.warning(f"Failed to persist query/response log to database: {str(e)}")
+            logger.error(f"Failed to persist query/response log to database: {str(e)}", exc_info=True)
             db.rollback()
+            raise
 
 
 advisor_orchestrator = AdvisorOrchestrator()

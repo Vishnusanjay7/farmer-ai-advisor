@@ -28,7 +28,7 @@ def utc_now():
 class FarmerProfile(Base):
     __tablename__ = "farmer_profiles"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     session_id = Column(String(64), unique=True, nullable=False, index=True)
     phone_number = Column(String(15), unique=True, nullable=True)
     full_name = Column(String(100), nullable=True)
@@ -50,8 +50,8 @@ class FarmerProfile(Base):
 class FarmerCrop(Base):
     __tablename__ = "farmer_crops"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    farmer_id = Column(String(36), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    farmer_id = Column(Uuid(as_uuid=False), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     crop_name = Column(String(50), nullable=False)
     variety = Column(String(50), nullable=True)
     sowing_date = Column(Date, nullable=True)
@@ -68,7 +68,7 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    farmer_id = Column(String(36), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    farmer_id = Column(Uuid(as_uuid=False), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     title = Column(String(150), nullable=True)
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
@@ -80,9 +80,9 @@ class Conversation(Base):
 class QueryLog(Base):
     __tablename__ = "query_logs"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     conversation_id = Column(Uuid(as_uuid=False), ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False, index=True)
-    farmer_id = Column(String(36), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    farmer_id = Column(Uuid(as_uuid=False), ForeignKey("farmer_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     input_channel = Column(String(20), default="voice", nullable=False)  # 'voice' | 'text'
     audio_storage_path = Column(String(255), nullable=True)
     detected_language = Column(String(10), nullable=False)
@@ -99,8 +99,8 @@ class QueryLog(Base):
 class ResponseLog(Base):
     __tablename__ = "response_logs"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    query_id = Column(String(36), ForeignKey("query_logs.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    id = Column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    query_id = Column(Uuid(as_uuid=False), ForeignKey("query_logs.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
     response_text = Column(Text, nullable=False)
     audio_response_path = Column(String(255), nullable=True)
     is_grounded = Column(Boolean, default=True, nullable=False)

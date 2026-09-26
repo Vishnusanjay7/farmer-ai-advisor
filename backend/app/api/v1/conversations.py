@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -18,7 +19,18 @@ async def get_conversation_history(
     conversation_id: str,
     db: Session = Depends(get_db),
 ) -> ConversationHistoryResponse:
-    conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+    try:
+        conv_uuid = str(uuid.UUID(str(conversation_id).strip()))
+    except (ValueError, AttributeError):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "INVALID_CONVERSATION_ID",
+                "message": f"Invalid conversation ID format: '{conversation_id}'. Must be a valid UUID.",
+            },
+        )
+
+    conv = db.query(Conversation).filter(Conversation.id == conv_uuid).first()
     if not conv:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -27,7 +39,7 @@ async def get_conversation_history(
 
     queries = (
         db.query(QueryLog)
-        .filter(QueryLog.conversation_id == conversation_id)
+        .filter(QueryLog.conversation_id == conv_uuid)
         .order_by(QueryLog.created_at.asc())
         .all()
     )

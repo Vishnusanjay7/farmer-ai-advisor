@@ -95,10 +95,22 @@ def test_conversation_and_query_log_uuid_mapping():
     from backend.app.db.session import Base
 
     # 1. Type inspection
+    assert isinstance(FarmerProfile.id.type, Uuid)
+    assert FarmerProfile.id.type.as_uuid is False
     assert isinstance(Conversation.id.type, Uuid)
     assert Conversation.id.type.as_uuid is False
+    assert isinstance(Conversation.farmer_id.type, Uuid)
+    assert Conversation.farmer_id.type.as_uuid is False
+    assert isinstance(QueryLog.id.type, Uuid)
+    assert QueryLog.id.type.as_uuid is False
     assert isinstance(QueryLog.conversation_id.type, Uuid)
     assert QueryLog.conversation_id.type.as_uuid is False
+    assert isinstance(QueryLog.farmer_id.type, Uuid)
+    assert QueryLog.farmer_id.type.as_uuid is False
+    assert isinstance(ResponseLog.id.type, Uuid)
+    assert ResponseLog.id.type.as_uuid is False
+    assert isinstance(ResponseLog.query_id.type, Uuid)
+    assert ResponseLog.query_id.type.as_uuid is False
 
     # 2. Functional persistence and query check
     engine = create_engine("sqlite:///:memory:")

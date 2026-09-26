@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
+const isValidUUID = (id: string | null | undefined): boolean => {
+  return typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id.trim());
+};
+
 const SUPPORTED_LANGUAGES = [
   { code: "hi-IN", label: "हिंदी (Hindi)" },
   { code: "te-IN", label: "తెలుగు (Telugu)" },
@@ -92,7 +96,7 @@ export default function FarmerAdvisorPage() {
   // Initialize conversation and context from storage
   useEffect(() => {
     const storedConv = sessionStorage.getItem("farmer_conv_id");
-    if (storedConv) {
+    if (storedConv && isValidUUID(storedConv)) {
       setConversationId(storedConv);
     } else {
       const newId = crypto.randomUUID();
@@ -294,11 +298,12 @@ export default function FarmerAdvisorPage() {
     setTextInput("");
 
     try {
+      const validConvId = isValidUUID(conversationId) ? conversationId : undefined;
       const payload = {
         query: trimmed,
         language: selectedLanguage,
         input_channel: channel,
-        conversation_id: conversationId || undefined,
+        conversation_id: validConvId,
         farmer_context: {
           state: farmerContext.state || undefined,
           district: farmerContext.district || undefined,
@@ -321,7 +326,7 @@ export default function FarmerAdvisorPage() {
       const data = await response.json();
 
       // Update conversation_id if newly returned
-      if (data.conversation_id && data.conversation_id !== conversationId) {
+      if (data.conversation_id && data.conversation_id !== conversationId && isValidUUID(data.conversation_id)) {
         setConversationId(data.conversation_id);
         sessionStorage.setItem("farmer_conv_id", data.conversation_id);
       }

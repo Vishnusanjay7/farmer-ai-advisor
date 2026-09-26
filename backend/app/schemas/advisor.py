@@ -1,6 +1,7 @@
+import uuid
 from enum import Enum
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AgriculturalIntent(str, Enum):
@@ -57,7 +58,20 @@ class AdvisorQueryRequest(BaseModel):
     language: str = Field(default="hi-IN", description="Language code (e.g. hi-IN, te-IN, en-IN)")
     input_channel: str = Field(default="text", pattern="^(voice|text)$", description="Input channel ('voice' or 'text')")
     farmer_context: Optional[FarmerContextDTO] = None
-    conversation_id: Optional[str] = None
+    conversation_id: Optional[str] = Field(default=None, description="Optional UUID string of the conversation")
+
+    @field_validator("conversation_id", mode="before")
+    @classmethod
+    def validate_conversation_id(cls, v: Any) -> Optional[str]:
+        if v is None or v == "":
+            return None
+        v_str = str(v).strip()
+        if not v_str:
+            return None
+        try:
+            return str(uuid.UUID(v_str))
+        except (ValueError, AttributeError):
+            raise ValueError(f"Invalid conversation_id '{v}'. Must be a valid UUID.")
 
 
 class AdvisorQueryResponse(BaseModel):
