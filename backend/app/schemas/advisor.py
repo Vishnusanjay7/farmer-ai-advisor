@@ -9,9 +9,27 @@ class AgriculturalIntent(str, Enum):
     PEST_DISEASE = "PEST_DISEASE"
     GOVERNMENT_SCHEME = "GOVERNMENT_SCHEME"
     MANDI_PRICE = "MANDI_PRICE"
+    FERTILIZER = "FERTILIZER"
+    IRRIGATION = "IRRIGATION"
+    SEED_SELECTION = "SEED_SELECTION"
+    SEED_TREATMENT = "SEED_TREATMENT"
+    SOIL_MANAGEMENT = "SOIL_MANAGEMENT"
+    WEED_MANAGEMENT = "WEED_MANAGEMENT"
+    CROP_INSURANCE = "CROP_INSURANCE"
+    AGRICULTURAL_CREDIT = "AGRICULTURAL_CREDIT"
+    POST_HARVEST = "POST_HARVEST"
+    STORAGE = "STORAGE"
+    HARVESTING = "HARVESTING"
     GENERAL_AGRICULTURE = "GENERAL_AGRICULTURE"
     UNSUPPORTED = "UNSUPPORTED"
     UNKNOWN = "UNKNOWN"
+
+
+class AuthUser(BaseModel):
+    id: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = "authenticated"
 
 
 class FarmerContextDTO(BaseModel):
@@ -115,3 +133,18 @@ class ConversationHistoryResponse(BaseModel):
     title: Optional[str] = None
     total_turns: int
     turns: List[ConversationTurnDTO] = Field(default_factory=list)
+
+
+class ConversationSummaryDTO(BaseModel):
+    id: str
+    title: Optional[str] = None
+    created_at: str
+    updated_at: str
+    total_turns: int
+    last_query: Optional[str] = None
+    detected_language: Optional[str] = None
+
+
+class ConversationListResponse(BaseModel):
+    total: int
+    conversations: List[ConversationSummaryDTO] = Field(default_factory=list)

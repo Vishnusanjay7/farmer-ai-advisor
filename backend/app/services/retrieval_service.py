@@ -55,10 +55,30 @@ class RetrievalService:
         k = top_k or settings.RAG_TOP_K
         threshold = similarity_threshold if similarity_threshold is not None else settings.RAG_SIMILARITY_THRESHOLD
 
-        if intent in (AgriculturalIntent.CROP_ADVISORY, AgriculturalIntent.PEST_DISEASE, AgriculturalIntent.GENERAL_AGRICULTURE):
+        if intent in (
+            AgriculturalIntent.CROP_ADVISORY,
+            AgriculturalIntent.PEST_DISEASE,
+            AgriculturalIntent.GENERAL_AGRICULTURE,
+            AgriculturalIntent.FERTILIZER,
+            AgriculturalIntent.IRRIGATION,
+            AgriculturalIntent.SEED_SELECTION,
+            AgriculturalIntent.SEED_TREATMENT,
+            AgriculturalIntent.SOIL_MANAGEMENT,
+            AgriculturalIntent.WEED_MANAGEMENT,
+            AgriculturalIntent.POST_HARVEST,
+            AgriculturalIntent.STORAGE,
+            AgriculturalIntent.HARVESTING,
+        ):
             return await self._retrieve_agricultural_knowledge(db, query, context, k, threshold)
-        elif intent == AgriculturalIntent.GOVERNMENT_SCHEME:
-            return self._retrieve_government_schemes(db, query, context, k)
+        elif intent in (
+            AgriculturalIntent.GOVERNMENT_SCHEME,
+            AgriculturalIntent.CROP_INSURANCE,
+            AgriculturalIntent.AGRICULTURAL_CREDIT,
+        ):
+            schemes = self._retrieve_government_schemes(db, query, context, k)
+            if schemes:
+                return schemes
+            return await self._retrieve_agricultural_knowledge(db, query, context, k, threshold)
         elif intent == AgriculturalIntent.MANDI_PRICE:
             return await self._retrieve_mandi_prices(db, query, context, k)
         else:

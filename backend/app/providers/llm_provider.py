@@ -222,7 +222,7 @@ class MockLLMProvider(LLMProvider):
         context_chunks: List[str],
         farmer_context: Optional[Dict[str, Any]] = None,
     ) -> LLMGroundedResponse:
-        lang = farmer_context.get("language", "en-IN") if farmer_context else "en-IN"
+        lang = (farmer_context.get("language") if farmer_context else None) or "en-IN"
 
         if not context_chunks:
             return LLMGroundedResponse(

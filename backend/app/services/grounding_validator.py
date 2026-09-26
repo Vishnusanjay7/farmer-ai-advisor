@@ -19,12 +19,20 @@ class GroundingValidator:
         "ta-IN": "இந்தக் கேள்விக்கு பாதுகாப்பான பதிலளிக்க அதிகாரப்பூர்வ வேளாண் மற்றும் அரசு ஆதாரங்களில் போதுமான சரிபார்க்கப்பட்ட தகவல் கிடைக்கவில்லை.",
         "mr-IN": "या प्रश्नाचे सुरक्षित उत्तर देण्यासाठी अधिकृत कृषी आणि शासकीय स्त्रोतांमध्ये पुरेशी पडताळणी केलेली माहिती मिळाली नाही.",
         "kn-IN": "ಈ ಪ್ರಶ್ನೆಗೆ ಸುರಕ್ಷಿತ ಉತ್ತರಿಸಲು ಅಧಿಕೃತ ಕೃಷಿ ಮತ್ತು ಸರ್ಕಾರಿ ಮೂಲಗಳಲ್ಲಿ ಸಾಕಷ್ಟು ಪರಿಶೀಲಿಸಿದ ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ.",
+        "bn-IN": "এই প্রশ্নের নিরাপদ উত্তর দেওয়ার জন্য আনুষ্ঠানিক কৃষি এবং সরকারি সূত্রে পর্যাপ্ত যাচাইকৃত তথ্য পাওয়া যায়নি।",
+        "gu-IN": "આ પ્રશ્નનો સુરક્ષિત જવાબ આપવા માટે સત્તાવાર કૃષિ અને સરકારી સ્ત્રોતોમાં પૂરતી ચકાસાયેલ માહિતી મળી નથી.",
+        "ml-IN": "ഈ ചോദ്യത്തിന് സുരക്ഷിതമായ ഉത്തരം നൽകുന്നതിന് ഔദ്യോഗിക കാർഷിക, സർക്കാർ സ്രോതസ്സുകളിൽ ആവശ്യത്തിന് സ്ഥിരീകരിച്ച വിവരങ്ങൾ ലഭ്യമല്ല.",
+        "pa-IN": "ਇਸ ਸਵਾਲ ਦਾ ਸੁਰੱਖਿਅਤ ਜਵਾਬ ਦੇਣ ਲਈ ਅਧਿਕਾਰਤ ਖੇਤੀਬਾੜੀ ਅਤੇ ਸਰਕਾਰੀ ਸਰੋਤਾਂ ਵਿੱਚ ਲੋੜੀਂਦੀ ਤਸਦੀਕਸ਼ੁਦਾ ਜਾਣਕਾਰੀ ਨਹੀਂ ਮਿਲੀ।",
+        "od-IN": "ଏହି ପ୍ରଶ୍ନର ନିରାପଦ ଉତ୍ତର ଦେବା ପାଇଁ ସରକାରୀ ଏବଂ କୃଷି ଉତ୍ସରୁ ଯଥେଷ୍ଟ ଯାଞ୍ଚ ହୋଇଥିବା ତଥ୍ୟ ମିଳିଲା ନାହିଁ।",
         "en-IN": "I couldn't find enough verified agricultural information in official ICAR, SAU, or government sources to answer that safely.",
     }
 
     def get_abstention_text(self, language: str = "en-IN", reason_detail: Optional[str] = None) -> str:
-        base = self.DEFAULT_ABSTENTION_MESSAGES.get(language, self.DEFAULT_ABSTENTION_MESSAGES["en-IN"])
-        if reason_detail:
+        lang_key = language
+        if lang_key == "or-IN":
+            lang_key = "od-IN"
+        base = self.DEFAULT_ABSTENTION_MESSAGES.get(lang_key, self.DEFAULT_ABSTENTION_MESSAGES["en-IN"])
+        if reason_detail and language == "en-IN":
             return f"{base} ({reason_detail})"
         return base
 

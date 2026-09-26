@@ -143,7 +143,10 @@ LANGUAGE_REGISTRY: Dict[str, LanguageConfig] = {
 
 def get_language_config(code: str) -> Optional[LanguageConfig]:
     """Retrieves language configuration by BCP-47 code or None if not registered."""
-    return LANGUAGE_REGISTRY.get(code.strip())
+    clean = code.strip()
+    if clean == "or-IN":
+        clean = "od-IN"
+    return LANGUAGE_REGISTRY.get(clean)
 
 
 def is_stt_supported(code: str) -> bool:
