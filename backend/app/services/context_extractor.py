@@ -21,6 +21,25 @@ class ContextExtractor:
         "mustard": ["mustard", "सरसों", "ఆవాలు"],
         "gram": ["gram", "chana", "चना", "శనగలు"],
         "dragon fruit": ["dragon fruit", "pitaya", "ड्रैगन फ्रूट", "कमलम"],
+        # High-volume mandi vegetables and fruits — missing entries caused
+        # explicit query crop to be silently discarded, falling back to stale
+        # inherited context (e.g., tomato query returning Wheat).
+        "tomato": ["tomato", "टमाटर", "టొమాటో", "தக்காளி", "tamatar"],
+        "onion": ["onion", "प्याज", "ఉల్లిపాయ", "வெங்காயம்", "kanda", "pyaj"],
+        "potato": ["potato", "आलू", "బంగాళాదుంప", "உருளைக்கிழங்கு", "aloo"],
+        "groundnut": ["groundnut", "peanut", "मूंगफली", "వేరుశెనగ", "கடலை"],
+        "turmeric": ["turmeric", "हल्दी", "పసుపు", "மஞ்சள்", "haldi"],
+        "arhar": ["arhar", "toor", "tur", "pigeon pea", "अरहर", "तूर", "కందులు", "துவரை"],
+        "moong": ["moong", "mung", "green gram", "मूंग", "పెసలు", "பாசிப்பயறு"],
+        "urad": ["urad", "black gram", "उड़द", "మినుములు", "உளுந்து"],
+        "masoor": ["masoor", "lentil", "red lentil", "मसूर", "మసూర్"],
+        "bajra": ["bajra", "pearl millet", "बाजरा", "సజ్జ", "கம்பு"],
+        "jowar": ["jowar", "sorghum", "ज्वार", "జొన్న", "சோளம்"],
+        "sunflower": ["sunflower", "सूरजमुखी", "పొద్దుతిరుగుడు", "சூரியகாந்தி"],
+        "banana": ["banana", "केला", "అరటి", "வாழை", "kela"],
+        "mango": ["mango", "आम", "మామిడి", "மாம்பழம்", "aam"],
+        "garlic": ["garlic", "लहसुन", "వెల్లుల్లి", "பூண்டு", "lahsun"],
+        "ginger": ["ginger", "अदरक", "అల్లం", "இஞ்சி", "adrak"],
     }
 
     STATES = {
@@ -55,6 +74,19 @@ class ContextExtractor:
         "Nashik": ["nashik", "नासिक"],
         "Nagpur": ["nagpur", "नागपुर"],
         "Barabanki": ["barabanki", "बाराबंकी"],
+        "Tiruppur": ["tiruppur", "tirupur", "திருப்பூர்"],
+        "Salem": ["salem", "சேலம்"],
+        "Erode": ["erode", "ஈரோடு"],
+        "Kurnool": ["kurnool", "కర్నూలు"],
+        "Vijayawada": ["vijayawada", "విజయవాడ"],
+        "Mysuru": ["mysuru", "mysore", "ಮೈಸೂರು"],
+        "Hubli": ["hubli", "hubballi", "ಹುಬ್ಬಳ್ಳಿ"],
+        "Pune": ["pune", "पुणे"],
+        "Solapur": ["solapur", "सोलापूर"],
+        "Varanasi": ["varanasi", "banaras", "वाराणसी"],
+        "Agra": ["agra", "आगरा"],
+        "Patna": ["patna", "पटना"],
+        "Bhubaneswar": ["bhubaneswar", "bhubaneshwar", "ଭୁବନେଶ୍ୱର"],
     }
 
     # Canonical mapping of districts to their respective Indian states.
@@ -67,12 +99,25 @@ class ContextExtractor:
         "Amritsar": "Punjab",
         "Karnal": "Haryana",
         "Guntur": "Andhra Pradesh",
+        "Kurnool": "Andhra Pradesh",
+        "Vijayawada": "Andhra Pradesh",
         "Warangal": "Telangana",
         "Coimbatore": "Tamil Nadu",
         "Madurai": "Tamil Nadu",
+        "Tiruppur": "Tamil Nadu",
+        "Salem": "Tamil Nadu",
+        "Erode": "Tamil Nadu",
         "Nashik": "Maharashtra",
         "Nagpur": "Maharashtra",
+        "Pune": "Maharashtra",
+        "Solapur": "Maharashtra",
         "Barabanki": "Uttar Pradesh",
+        "Varanasi": "Uttar Pradesh",
+        "Agra": "Uttar Pradesh",
+        "Mysuru": "Karnataka",
+        "Hubli": "Karnataka",
+        "Patna": "Bihar",
+        "Bhubaneswar": "Odisha",
     }
 
     SEASONS = {
@@ -123,11 +168,17 @@ class ContextExtractor:
         q_lower = query.lower()
         extracted: Dict[str, Any] = {}
 
-        # 1. Extract crop from query
+        # 1. Extract crop from query (longest matching alias takes precedence to resolve compound aliases
+        # such as 'green gram' -> Moong vs 'gram' -> Gram)
+        best_crop = None
+        best_len = 0
         for canonical, aliases in self.CROPS.items():
-            if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                extracted["crop"] = canonical.capitalize()
-                break
+            for alias in aliases:
+                if self._matches_entity(alias, q_lower) and len(alias) > best_len:
+                    best_crop = canonical.capitalize()
+                    best_len = len(alias)
+        if best_crop:
+            extracted["crop"] = best_crop
 
         # 2. Extract state from query
         for canonical, aliases in self.STATES.items():
