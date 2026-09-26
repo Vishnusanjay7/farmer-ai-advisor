@@ -96,6 +96,16 @@ class AdvisorOrchestrator:
         ctx_dict = extracted_ctx.model_dump(exclude_none=True)
         for field, val in inherited_dict.items():
             if field not in ctx_dict or not ctx_dict[field]:
+                # Location conflict guard: do not inherit a state that contradicts the query's district
+                if field == "state" and extracted_ctx.district:
+                    canonical_state = context_extractor.DISTRICT_TO_STATE.get(extracted_ctx.district)
+                    if canonical_state and canonical_state != val:
+                        continue
+                # Do not inherit a district that contradicts the query's state
+                if field == "district" and extracted_ctx.state:
+                    canonical_state = context_extractor.DISTRICT_TO_STATE.get(val)
+                    if canonical_state and canonical_state != extracted_ctx.state:
+                        continue
                 setattr(extracted_ctx, field, val)
                 effective_inherited[field] = val
 

@@ -7,7 +7,7 @@ from backend.app.core.config import settings
 from backend.app.core.logging import logger
 from backend.app.core.languages import is_stt_supported, get_language_config
 from backend.app.providers.base import SpeechToTextProvider, STTResult
-from backend.app.services.audio_validator import validate_audio_payload
+from backend.app.services.audio_validator import validate_audio_payload, detect_audio_format
 
 
 class SarvamSTTProvider(SpeechToTextProvider):
@@ -42,11 +42,12 @@ class SarvamSTTProvider(SpeechToTextProvider):
         model_name = lang_cfg.stt_model if lang_cfg else self.model
 
         # 4. Prepare multipart request per official Sarvam API spec
+        fmt_info = detect_audio_format(audio_bytes)
         headers = {
             "api-subscription-key": self.api_key,
         }
         files = {
-            "file": ("audio.wav", io.BytesIO(audio_bytes), "audio/wav"),
+            "file": (fmt_info.filename, io.BytesIO(audio_bytes), fmt_info.content_type),
         }
         data = {
             "model": model_name,

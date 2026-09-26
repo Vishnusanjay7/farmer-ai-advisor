@@ -7,6 +7,7 @@ class ContextExtractor:
     """
     Extracts agricultural context strictly when explicitly mentioned in the query.
     Never hallucinates or guesses unmentioned entities.
+    Applies context-aware precedence rules between current query and inherited context.
     """
 
     CROPS = {
@@ -53,6 +54,25 @@ class ContextExtractor:
         "Madurai": ["madurai", "மதுரை"],
         "Nashik": ["nashik", "नासिक"],
         "Nagpur": ["nagpur", "नागपुर"],
+        "Barabanki": ["barabanki", "बाराबंकी"],
+    }
+
+    # Canonical mapping of districts to their respective Indian states.
+    # Enables automatic state derivation when a query explicitly identifies a known district.
+    DISTRICT_TO_STATE: Dict[str, str] = {
+        "Indore": "Madhya Pradesh",
+        "Bhopal": "Madhya Pradesh",
+        "Ujjain": "Madhya Pradesh",
+        "Ludhiana": "Punjab",
+        "Amritsar": "Punjab",
+        "Karnal": "Haryana",
+        "Guntur": "Andhra Pradesh",
+        "Warangal": "Telangana",
+        "Coimbatore": "Tamil Nadu",
+        "Madurai": "Tamil Nadu",
+        "Nashik": "Maharashtra",
+        "Nagpur": "Maharashtra",
+        "Barabanki": "Uttar Pradesh",
     }
 
     SEASONS = {
@@ -89,63 +109,105 @@ class ContextExtractor:
     def extract(self, query: str, initial_context: Optional[FarmerContextDTO] = None) -> FarmerContextDTO:
         """
         Extracts agricultural entities mentioned in the query.
-        Falls back to initial_context if already present, but never invents values.
+        Applies context-aware precedence rules:
+        1. Explicit location in current query > inherited/initial location context.
+        2. If current query explicitly identifies a district whose canonical mapping determines a state:
+           use the canonical state associated with that district (overriding stale inherited state).
+        3. If current query explicitly specifies both state and district:
+           use the current query values.
+        4. If current query does not specify location:
+           inherited farmer context may be used.
+        5. If the current query contains an internally inconsistent location combination:
+           preserve explicit query values without guessing so safe abstention can occur.
         """
-        ctx = initial_context.model_dump() if initial_context else {}
         q_lower = query.lower()
+        extracted: Dict[str, Any] = {}
 
-        # Extract crop
-        if not ctx.get("crop"):
-            for canonical, aliases in self.CROPS.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["crop"] = canonical.capitalize()
-                    break
+        # 1. Extract crop from query
+        for canonical, aliases in self.CROPS.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["crop"] = canonical.capitalize()
+                break
 
-        # Extract state
-        if not ctx.get("state"):
-            for canonical, aliases in self.STATES.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["state"] = canonical
-                    break
+        # 2. Extract state from query
+        for canonical, aliases in self.STATES.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["state"] = canonical
+                break
 
-        # Extract district
-        if not ctx.get("district"):
-            for canonical, aliases in self.DISTRICTS.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["district"] = canonical
-                    break
+        # 3. Extract district from query
+        for canonical, aliases in self.DISTRICTS.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["district"] = canonical
+                break
 
-        # Extract season
-        if not ctx.get("season"):
-            for canonical, aliases in self.SEASONS.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["season"] = canonical
-                    break
+        # 4. Extract season from query
+        for canonical, aliases in self.SEASONS.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["season"] = canonical
+                break
 
-        # Extract pest/disease
-        if not ctx.get("pest_disease"):
-            for canonical, aliases in self.PESTS_DISEASES.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["pest_disease"] = canonical
-                    break
+        # 5. Extract pest/disease from query
+        for canonical, aliases in self.PESTS_DISEASES.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["pest_disease"] = canonical
+                break
 
-        # Extract growth stage
-        if not ctx.get("growth_stage"):
-            for canonical, aliases in self.GROWTH_STAGES.items():
-                if any(self._matches_entity(alias, q_lower) for alias in aliases):
-                    ctx["growth_stage"] = canonical
-                    break
+        # 6. Extract growth stage from query
+        for canonical, aliases in self.GROWTH_STAGES.items():
+            if any(self._matches_entity(alias, q_lower) for alias in aliases):
+                extracted["growth_stage"] = canonical
+                break
+
+        # Canonical State Resolution:
+        # If the query explicitly identified a district, check canonical state mapping
+        if "district" in extracted:
+            canonical_state = self.DISTRICT_TO_STATE.get(extracted["district"])
+            if "state" not in extracted and canonical_state:
+                # Rule 2: Derive canonical state from explicit district
+                extracted["state"] = canonical_state
+
+        init_dict = initial_context.model_dump(exclude_none=True) if initial_context else {}
+
+        # Crop precedence: Query explicit crop > Initial context crop
+        crop = extracted.get("crop") or init_dict.get("crop")
+
+        # Location precedence:
+        if "district" in extracted:
+            district = extracted["district"]
+            # State is either explicit query state or canonical state derived from district;
+            # do not inherit an incompatible state from init_dict
+            state = extracted.get("state")
+        elif "state" in extracted:
+            state = extracted["state"]
+            # If query specified state, only inherit initial district if it belongs to this state
+            init_dist = init_dict.get("district")
+            if init_dist and self.DISTRICT_TO_STATE.get(init_dist) == state:
+                district = init_dist
+            else:
+                district = None
+        else:
+            # Rule 4: Neither state nor district in query -> safely inherit from initial context
+            state = init_dict.get("state")
+            district = init_dict.get("district")
+
+        season = extracted.get("season") or init_dict.get("season")
+        pest_disease = extracted.get("pest_disease") or init_dict.get("pest_disease")
+        growth_stage = extracted.get("growth_stage") or init_dict.get("growth_stage")
+        variety = extracted.get("variety") or init_dict.get("variety")
+        market = extracted.get("market") or init_dict.get("market")
+        language = extracted.get("language") or init_dict.get("language")
 
         return FarmerContextDTO(
-            crop=ctx.get("crop"),
-            variety=ctx.get("variety"),
-            state=ctx.get("state"),
-            district=ctx.get("district"),
-            market=ctx.get("market"),
-            season=ctx.get("season"),
-            growth_stage=ctx.get("growth_stage"),
-            pest_disease=ctx.get("pest_disease"),
-            language=ctx.get("language"),
+            crop=crop,
+            variety=variety,
+            state=state,
+            district=district,
+            market=market,
+            season=season,
+            growth_stage=growth_stage,
+            pest_disease=pest_disease,
+            language=language,
         )
 
 

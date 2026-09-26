@@ -175,7 +175,8 @@ export default function FarmerAdvisorPage() {
 
       recorder.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
-        handleUploadAndTranscribe(mimeType);
+        const finalMime = recorder.mimeType || mimeType;
+        handleUploadAndTranscribe(finalMime);
       };
 
       recorder.start(250);
@@ -226,13 +227,14 @@ export default function FarmerAdvisorPage() {
   const handleUploadAndTranscribe = async (mimeType: string) => {
     setAppState("TRANSCRIBING");
     try {
-      const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+      const actualMimeType = mediaRecorderRef.current?.mimeType || mimeType;
+      const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
       if (audioBlob.size === 0) {
         throw new Error("Recorded voice audio was empty.");
       }
 
       const formData = new FormData();
-      const ext = mimeType.includes("mp4") ? "m4a" : mimeType.includes("ogg") ? "ogg" : "webm";
+      const ext = actualMimeType.includes("mp4") ? "m4a" : actualMimeType.includes("ogg") ? "ogg" : "webm";
       formData.append("audio_file", audioBlob, `voice_query.${ext}`);
       formData.append("language", selectedLanguage);
 
